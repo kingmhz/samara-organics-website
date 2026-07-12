@@ -1,0 +1,12 @@
+{
+  "name": "Samara Organics",
+  "short_name": "Samara",
+  "description": "Pure by nature, honest by choice. Premium dairy from western Uttar Pradesh.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#082d20",
+  "theme_color": "#082d20",
+  "icons": [
+    { "src": "assets/samara-logo-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

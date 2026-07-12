@@ -1,0 +1,6 @@
+node_modules/
+*.db
+*.db-journal
+.agents/
+.DS_Store
+Thumbs.db

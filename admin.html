@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Samara Organics — Admin Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --forest: #082d20;
+      --forest2: #0d3a29;
+      --cream: #f5f0e5;
+      --ivory: #fffaf0;
+      --gold: #c6a251;
+      --palegold: #e6d49b;
+      --olive: #65783c;
+      --ink: #102e22;
+      --muted: #6f776f;
+      --line: rgba(16,46,34,.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: Manrope, sans-serif;
+    }
+    header {
+      background: var(--forest);
+      color: var(--ivory);
+      padding: 24px clamp(20px, 4vw, 40px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--gold);
+    }
+    header h1 {
+      font: 600 28px "Cormorant Garamond";
+      margin: 0;
+      letter-spacing: 0.1em;
+    }
+    header h1 span {
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .container {
+      padding: 40px clamp(20px, 4vw, 40px);
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .tabs {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 1px;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .tab-btn:hover {
+      color: var(--ink);
+    }
+    .tab-btn.active {
+      color: var(--forest);
+      border-color: var(--gold);
+    }
+    .panel {
+      display: none;
+      animation: fadeIn 0.3s ease both;
+    }
+    .panel.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Table styling */
+    .table-container {
+      background: var(--ivory);
+      border: 1px solid var(--line);
+      overflow-x: auto;
+      box-shadow: 0 10px 30px rgba(16,46,34,0.04);
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+    }
+    th {
+      background: rgba(16,46,34,0.03);
+      padding: 16px 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--line);
+      color: var(--forest);
+    }
+    td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .status-Pending { background: #e3ebfc; color: #3b5998; }
+    .status-Confirmed { background: #e2f3e7; color: var(--olive); }
+    .status-Delivered { background: #dff0d8; color: #3c763d; }
+    .status-Failed { background: #f2dede; color: #a94442; }
+    
+    .status-select {
+      padding: 6px 10px;
+      font-size: 11px;
+      font-family: Manrope, sans-serif;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      background: var(--ivory);
+      color: var(--ink);
+      outline: none;
+      cursor: pointer;
+    }
+    
+    /* Form styling */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .form-card {
+      background: var(--ivory);
+      border: 1px solid var(--line);
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(16,46,34,0.04);
+    }
+    .form-card h3 {
+      font: 600 24px "Cormorant Garamond";
+      margin: 0 0 20px;
+      color: var(--forest);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-family: Manrope, sans-serif;
+      background: var(--cream);
+      border: 1px solid var(--line);
+      outline: none;
+      color: var(--ink);
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--gold);
+    }
+    .form-submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--forest);
+      color: white;
+      border: 0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+    .form-submit-btn:hover {
+      background: var(--forest2);
+    }
+    
+    .loading-text {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      cursor: pointer;
+    }
+    .checkbox-wrapper input {
+      width: auto;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SAMARA ORGANICS <span>• Farm Administration</span></h1>
+    <a href="/" style="color: var(--palegold); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;">VIEW WEBSITE →</a>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" data-target="orders-panel">ORDERS LOG</button>
+      <button class="tab-btn" data-target="subs-panel">SUBSCRIBERS ROSTER</button>
+      <button class="tab-btn" data-target="batches-panel">TRACEABILITY BATCHES</button>
+    </div>
+
+    <!-- Panel 1: Orders -->
+    <div class="panel active" id="orders-panel">
+      <div class="table-container">
+        <table id="orders-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>CUSTOMER</th>
+              <th>ITEMS</th>
+              <th>PAYMENT</th>
+              <th>SLOT & DATE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr>
+              <td colspan="6" class="loading-text">Loading orders...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Panel 2: Subscriptions -->
+    <div class="panel" id="subs-panel">
+      <div class="table-container">
+        <table id="subs-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>CUSTOMER</th>
+              <th>PRODUCT</th>
+              <th>QTY</th>
+              <th>SCHEDULE</th>
+              <th>REGISTERED</th>
+            </tr>
+          </thead>
+          <tbody id="subs-tbody">
+            <tr>
+              <td colspan="6" class="loading-text">Loading subscriptions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Panel 3: Batches & Quality logs -->
+    <div class="panel" id="batches-panel">
+      <div class="form-grid">
+        <div class="form-card">
+          <h3>Create Quality Batch</h3>
+          <form id="create-batch-form">
+            <div class="form-group">
+              <label for="batch-id">BATCH ID</label>
+              <input type="text" id="batch-id" placeholder="e.g. SAM-0714" required>
+            </div>
+            <div class="form-group">
+              <label for="batch-product">PRODUCT NAME</label>
+              <select id="batch-product">
+                <option value="Organic A2 Milk">Organic A2 Milk</option>
+                <option value="Bilona Desi Ghee">Bilona Desi Ghee</option>
+                <option value="Traditional Dahi">Traditional Dahi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="batch-date">HARVEST / PRODUCTION DATE</label>
+              <input type="text" id="batch-date" placeholder="e.g. 14th July 2026" required>
+            </div>
+            <div class="form-group">
+              <label for="batch-fat">BUTTERFAT LEVEL (%)</label>
+              <input type="number" step="0.05" id="batch-fat" placeholder="e.g. 6.8" required>
+            </div>
+            <div class="form-group">
+              <label for="batch-snf">SNF CONTENT (%)</label>
+              <input type="number" step="0.05" id="batch-snf" placeholder="e.g. 9.2" required>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" id="batch-antibiotics">
+                <span>ANTIBIOTIC RESIDUES DETECTED</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="batch-score">OVERALL PURITY SCORE (%)</label>
+              <input type="number" id="batch-score" placeholder="e.g. 98" min="0" max="100" required>
+            </div>
+            <button type="submit" class="form-submit-btn">LOG QUALITY CERTIFICATE</button>
+          </form>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="form-card" style="flex:1">
+            <h3>Mock Payment Webhook Sandbox</h3>
+            <p style="font-size:12px; line-height:1.7; color:var(--muted); margin:0 0 20px;">Trigger simulated payments webhook payloads to verify Razorpay status updates inside the database.</p>
+            <form id="webhook-form">
+              <div class="form-group">
+                <label for="webhook-utr">12-DIGIT UTR CODE</label>
+                <input type="text" id="webhook-utr" placeholder="Enter UTR from incoming order" pattern="[0-9]{12}" required>
+              </div>
+              <div class="form-group">
+                <label for="webhook-status">PAYMENT STATUS</label>
+                <select id="webhook-status">
+                  <option value="success">Payment Verified (Success)</option>
+                  <option value="failed">Payment Failed</option>
+                </select>
+              </div>
+              <button type="submit" class="form-submit-btn" style="background:#5a6b5c">TRIGGER WEBHOOK CALLBACK</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.panel');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    // Load Orders
+    function loadOrders() {
+      const tbody = document.getElementById('orders-tbody');
+      fetch('/api/admin/orders')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) throw new Error(data.message);
+          
+          if (data.orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No orders recorded in database yet.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = data.orders.map(order => {
+            const dateStr = new Date(order.created_at).toLocaleString('en-IN');
+            const itemsHtml = order.items.map(it => {
+              const subLabel = it.delivery !== 'one-time' ? ` <strong style="color:var(--olive)">[${it.delivery}]</strong>` : '';
+              return `• ${it.qty} x ${it.name} (${it.unit})${subLabel}`;
+            }).join('<br>');
+            
+            const paymentDetails = `<b>${order.payment_method}</b>${order.utr ? `<br><small style="color:var(--muted)">UTR: ${order.utr}</small>` : ''}`;
+
+            return `
+              <tr>
+                <td><b>#${order.id}</b></td>
+                <td>
+                  <strong>${order.name}</strong><br>
+                  <small style="color:var(--muted)">+91 ${order.phone}</small><br>
+                  <small style="color:var(--muted)">${order.address} (${order.pincode})</small>
+                </td>
+                <td>${itemsHtml}</td>
+                <td>${paymentDetails}<br><b>₹${order.total_amount}</b></td>
+                <td><small>${order.delivery_slot}</small><br><span style="color:var(--muted); font-size:10px;">${dateStr}</span></td>
+                <td>
+                  <select class="status-select" data-id="${order.id}">
+                    <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Awaiting Payment Verification" ${order.status === 'Awaiting Payment Verification' ? 'selected' : ''}>Awaiting Verification</option>
+                    <option value="Confirmed" ${order.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                    <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                    <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                    <option value="Payment Failed" ${order.status === 'Payment Failed' ? 'selected' : ''}>Payment Failed</option>
+                  </select>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+          // Bind status change listeners
+          document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', () => {
+              const orderId = select.dataset.id;
+              const newStatus = select.value;
+              fetch(`/api/admin/orders/${orderId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+              })
+              .then(res => res.json())
+              .then(d => {
+                if (!d.success) alert(d.message);
+                else loadOrders();
+              });
+            });
+          });
+        })
+        .catch(err => {
+          tbody.innerHTML = `<tr><td colspan="6" class="loading-text" style="color:#a94442">Failed to load orders: ${err.message}</td></tr>`;
+        });
+    }
+
+    // Load Subscriptions
+    function loadSubscriptions() {
+      const tbody = document.getElementById('subs-tbody');
+      fetch('/api/admin/subscriptions')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) throw new Error(data.message);
+          
+          if (data.subscriptions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No active subscriptions registered.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = data.subscriptions.map(sub => {
+            const dateStr = new Date(sub.created_at).toLocaleDateString('en-IN');
+            return `
+              <tr>
+                <td><b>#${sub.id}</b></td>
+                <td>
+                  <strong>${sub.name}</strong><br>
+                  <small style="color:var(--muted)">+91 ${sub.phone}</small>
+                </td>
+                <td><b>${sub.product_name}</b></td>
+                <td>${sub.qty}</td>
+                <td><span class="status-badge status-Confirmed">${sub.schedule}</span></td>
+                <td><small>${dateStr}</small></td>
+              </tr>
+            `;
+          }).join('');
+        })
+        .catch(err => {
+          tbody.innerHTML = `<tr><td colspan="6" class="loading-text" style="color:#a94442">Failed to load subscriptions: ${err.message}</td></tr>`;
+        });
+    }
+
+    // Create Quality Batch Form Submit
+    document.getElementById('create-batch-form').addEventListener('submit', e => {
+      e.preventDefault();
+      
+      const payload = {
+        id: document.getElementById('batch-id').value.trim(),
+        product_name: document.getElementById('batch-product').value,
+        date: document.getElementById('batch-date').value.trim(),
+        fat: parseFloat(document.getElementById('batch-fat').value),
+        snf: parseFloat(document.getElementById('batch-snf').value),
+        antibiotics: document.getElementById('batch-antibiotics').checked,
+        quality_score: parseInt(document.getElementById('batch-score').value)
+      };
+
+      fetch('/api/admin/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(d => {
+        alert(d.message);
+        if (d.success) {
+          document.getElementById('create-batch-form').reset();
+        }
+      })
+      .catch(err => alert('Failed to create batch: ' + err.message));
+    });
+
+    // Mock Webhook Submit
+    document.getElementById('webhook-form').addEventListener('submit', e => {
+      e.preventDefault();
+      
+      const payload = {
+        utr: document.getElementById('webhook-utr').value.trim(),
+        status: document.getElementById('webhook-status').value
+      };
+
+      fetch('/api/webhooks/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(d => {
+        alert(d.message);
+        if (d.success) {
+          document.getElementById('webhook-form').reset();
+          loadOrders(); // Reload orders in background
+        }
+      })
+      .catch(err => alert('Webhook callback failed: ' + err.message));
+    });
+
+    // Initial load
+    loadOrders();
+    loadSubscriptions();
+  </script>
+</body>
+</html>

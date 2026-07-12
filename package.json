@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "sharp": "^0.35.3",
+    "sqlite3": "^6.0.1"
+  }
+}
