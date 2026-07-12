@@ -267,7 +267,10 @@
               <th>CUSTOMER</th>
               <th>PRODUCT</th>
               <th>QTY</th>
+              <th>SLOT</th>
               <th>SCHEDULE</th>
+              <th>START DATE</th>
+              <th>DATES / DETAILS</th>
               <th>REGISTERED</th>
             </tr>
           </thead>
@@ -440,22 +443,37 @@
           if (!data.success) throw new Error(data.message);
           
           if (data.subscriptions.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No active subscriptions registered.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="loading-text">No active subscriptions registered.</td></tr>';
             return;
           }
 
           tbody.innerHTML = data.subscriptions.map(sub => {
             const dateStr = new Date(sub.created_at).toLocaleDateString('en-IN');
+            let customDatesText = '—';
+            if (sub.custom_dates) {
+              try {
+                const datesArr = JSON.parse(sub.custom_dates);
+                if (Array.isArray(datesArr) && datesArr.length > 0) {
+                  customDatesText = `<details><summary>${datesArr.length} days selected</summary><div style="max-width:200px; max-height:80px; overflow-y:auto; font-size:10px; color:var(--muted); line-height:1.4; margin-top:5px; border-top:1px dashed var(--line); padding-top:4px;">${datesArr.join(', ')}</div></details>`;
+                }
+              } catch (e) {
+                console.error('Error parsing custom dates:', e);
+              }
+            }
             return `
               <tr>
                 <td><b>#${sub.id}</b></td>
                 <td>
                   <strong>${sub.name}</strong><br>
-                  <small style="color:var(--muted)">+91 ${sub.phone}</small>
+                  <small style="color:var(--muted)">+91 ${sub.phone}</small><br>
+                  <small style="color:var(--muted)">${sub.address || ''} (${sub.pincode || ''})</small>
                 </td>
                 <td><b>${sub.product_name}</b></td>
                 <td>${sub.qty}</td>
+                <td><small>${sub.delivery_slot || '—'}</small></td>
                 <td><span class="status-badge status-Confirmed">${sub.schedule}</span></td>
+                <td><small>${sub.start_date || '—'}</small></td>
+                <td>${customDatesText}</td>
                 <td><small>${dateStr}</small></td>
               </tr>
             `;

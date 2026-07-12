@@ -92,44 +92,30 @@ menu?.addEventListener('click', () => {
 });
 document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', closeMenu));
 let scrollTicking = false;
+const heroImage = document.querySelector('.hero-image');
+const backToTop = document.getElementById('backToTop');
 addEventListener('scroll', () => {
   if (scrollTicking) return;
   scrollTicking = true;
   requestAnimationFrame(() => {
-    header.classList.toggle('scrolled', scrollY > 40);
+    const sy = scrollY;
+    header.classList.toggle('scrolled', sy > 40);
+    // Parallax: hero image shifts slower than scroll
+    if (heroImage && sy < 1200) heroImage.style.transform = `translateY(${sy * 0.35}px) scale(1.03)`;
+    // Back-to-top visibility
+    if (backToTop) backToTop.classList.toggle('visible', sy > 600);
     scrollTicking = false;
   });
 }, { passive: true });
+// Back-to-top click handler
+backToTop?.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
 
-// Delivery area check. Prefixes cover the initial Aligarh/Bulandshahr launch belt.
-const pinForm = document.querySelector('#pin-form');
-const pinResult = document.querySelector('.pin-result');
-const launchPrefixes = ['2020', '2030', '2031', '2032', '2033', '2034', '2454'];
-pinForm?.addEventListener('submit', event => {
-  event.preventDefault();
-  const input = pinForm.querySelector('input');
-  const pin = input.value.replace(/\D/g, '');
-  if (pin.length !== 6) {
-    pinResult.textContent = 'Please enter a valid 6-digit PIN code.';
-    pinResult.className = 'pin-result error';
-    input.focus();
-    return;
-  }
-  const inLaunchArea = launchPrefixes.some(prefix => pin.startsWith(prefix));
-  pinResult.className = `pin-result${inLaunchArea ? '' : ' error'}`;
-  pinResult.innerHTML = inLaunchArea
-    ? `Great news — <strong>${pin}</strong> is in or close to our planned first delivery belt. Join the list below for confirmation.`
-    : `We have saved <strong>${pin}</strong> as an area of interest. Join the list and we will let you know when a route opens.`;
-  safeStore.set(localStorage, 'samara-pincode', pin);
-});
-const savedPin = safeStore.get(localStorage, 'samara-pincode');
-if (savedPin && pinForm) pinForm.querySelector('input').value = savedPin;
 
 // Premium Shopping Cart & Multi-step Checkout Logic
 const PRODUCTS_INFO = {
   "Organic A2 Milk": { price: 110, unit: "1 L", img: "assets/samara-milk-bottle.webp" },
   "Bilona Desi Ghee": { price: 749, unit: "500 ML", img: "assets/samara-ghee-jar.webp" },
-  "Traditional Dahi": { price: 99, unit: "500 ML", img: "assets/samara-dahi-bowl.webp" }
+  "Traditional Dahi": { price: 89, unit: "500 ML", img: "assets/samara-dahi-bowl.webp" }
 };
 
 let cart = {};
@@ -314,6 +300,36 @@ document.querySelectorAll('.product-action').forEach(button => {
     event.stopPropagation();
     const product = button.closest('.product').dataset.product;
     addToCart(product);
+  });
+});
+
+function buyNow(name) {
+  if (!cart[name]) {
+    cart[name] = { qty: 1, delivery: name === 'Organic A2 Milk' ? 'daily' : 'one-time' };
+  }
+  renderCart();
+  openDrawer();
+  
+  showView('checkout');
+  
+  const nameInput = document.querySelector('#checkout-name');
+  const phoneInput = document.querySelector('#checkout-phone');
+  const pinInput = document.querySelector('#checkout-pincode');
+  
+  if (nameInput) nameInput.value = safeStore.get(localStorage, 'samara-name', '');
+  if (phoneInput) phoneInput.value = safeStore.get(localStorage, 'samara-mobile', '');
+  if (pinInput) pinInput.value = safeStore.get(localStorage, 'samara-pincode', '');
+  
+  setTimeout(() => {
+    if (nameInput) nameInput.focus();
+  }, 120);
+}
+
+document.querySelectorAll('.product-buy-now').forEach(button => {
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    const product = button.closest('.product').dataset.product;
+    buyNow(product);
   });
 });
 
@@ -707,3 +723,500 @@ if ('serviceWorker' in navigator) {
     addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(() => {}), { once: true });
   }
 }
+
+// Daily Subscription Modal with Calendar Feature
+(() => {
+  const subModal = document.querySelector('#subscribe-modal');
+  const subHeaderBtn = document.querySelector('#subscribe-header-btn');
+  const subModalClose = document.querySelector('#subscribe-modal-close');
+  const subForm = document.querySelector('#subscribe-modal-form');
+  const subCalendarGrid = document.querySelector('#sub-calendar-grid');
+  
+  const subProduct = document.querySelector('#sub-product');
+  const subQty = document.querySelector('#sub-qty');
+  const subSlot = document.querySelector('#sub-slot');
+  const subSchedule = document.querySelector('#sub-schedule');
+  
+  const prevMonthBtn = document.querySelector('.prev-month');
+  const nextMonthBtn = document.querySelector('.next-month');
+  const monthYearLabel = document.querySelector('.calendar-month-year');
+  const daysCountLabel = document.querySelector('#sub-days-count');
+  const totalCostLabel = document.querySelector('#sub-total-cost');
+  
+  const subName = document.querySelector('#sub-name');
+  const subPhone = document.querySelector('#sub-phone');
+  const subPincode = document.querySelector('#sub-pincode');
+  const subAddress = document.querySelector('#sub-address');
+  
+  const subDirectBtn = document.querySelector('#sub-direct-btn');
+  const subWhatsappBtn = document.querySelector('#sub-whatsapp-btn');
+  
+  const subSuccessCloseBtn = document.querySelector('#sub-success-close-btn');
+  const subSuccessView = document.querySelector('.sub-success-view');
+  const subFormContainer = document.querySelector('#sub-form-container');
+
+  let currentYear, currentMonth;
+  let selectedDates = new Set();
+  
+  // Set default calendar to today
+  const today = new Date();
+  currentYear = today.getFullYear();
+  currentMonth = today.getMonth();
+
+  // Define booking bounds: Next 60 days maximum
+  const bookingStart = new Date();
+  bookingStart.setHours(0,0,0,0);
+  const bookingEnd = new Date();
+  bookingEnd.setDate(bookingStart.getDate() + 60);
+  bookingEnd.setHours(23,59,59,999);
+
+  let currentDuration = 30; // default duration
+
+  const btnSelect30 = document.querySelector('#btn-select-30');
+  const btnSelect60 = document.querySelector('#btn-select-60');
+
+  btnSelect30?.addEventListener('click', () => {
+    currentDuration = 30;
+    btnSelect30.classList.add('active');
+    btnSelect60?.classList.remove('active');
+    applySchedule(subSchedule.value);
+  });
+
+  btnSelect60?.addEventListener('click', () => {
+    currentDuration = 60;
+    btnSelect60.classList.add('active');
+    btnSelect30?.classList.remove('active');
+    applySchedule(subSchedule.value);
+  });
+
+  // Helper to open modal
+  subHeaderBtn?.addEventListener('click', () => {
+    subModal?.classList.add('open');
+    subModal?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    
+    // Auto-fill customer details from safeStore
+    if (subName) subName.value = safeStore.get(localStorage, 'samara-name') || '';
+    if (subPhone) subPhone.value = safeStore.get(localStorage, 'samara-mobile') || '';
+    if (subPincode) subPincode.value = safeStore.get(localStorage, 'samara-pincode') || '';
+    if (subAddress) subAddress.value = safeStore.get(localStorage, 'samara-address') || '';
+
+    // Default to "daily" schedule and select all active days (first 30 days)
+    currentDuration = 30;
+    if (btnSelect30) btnSelect30.classList.add('active');
+    if (btnSelect60) btnSelect60.classList.remove('active');
+    if (subSchedule) subSchedule.value = 'daily';
+    applySchedule('daily');
+  });
+
+  // Helper to close modal
+  function closeSubModal() {
+    subModal?.classList.remove('open');
+    subModal?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    
+    // Reset views
+    if (subFormContainer) subFormContainer.style.display = 'block';
+    if (subSuccessView) subSuccessView.style.display = 'none';
+  }
+
+  subModalClose?.addEventListener('click', closeSubModal);
+  subModal?.querySelector('.modal-backdrop')?.addEventListener('click', closeSubModal);
+  subSuccessCloseBtn?.addEventListener('click', closeSubModal);
+
+  // Render Calendar Grid
+  function renderCalendar(year, month) {
+    if (!subCalendarGrid) return;
+    subCalendarGrid.innerHTML = '';
+    
+    // Update header label
+    const tempDate = new Date(year, month, 1);
+    if (monthYearLabel) {
+      monthYearLabel.textContent = tempDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+    
+    // Allow month navigation up to the next 2 months
+    const minMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const maxMonthDate = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    const currentMonthDate = new Date(year, month, 1);
+    
+    if (prevMonthBtn) prevMonthBtn.disabled = (currentMonthDate <= minMonthDate);
+    if (nextMonthBtn) nextMonthBtn.disabled = (currentMonthDate >= maxMonthDate);
+    
+    let startDay = new Date(year, month, 1).getDay();
+    startDay = startDay === 0 ? 6 : startDay - 1;
+    
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    
+    for (let i = 0; i < startDay; i++) {
+      const blank = document.createElement('span');
+      blank.className = 'day-empty';
+      subCalendarGrid.appendChild(blank);
+    }
+    
+    for (let day = 1; day <= totalDays; day++) {
+      const cellDate = new Date(year, month, day);
+      cellDate.setHours(0,0,0,0);
+      
+      const cell = document.createElement('span');
+      cell.textContent = day;
+      
+      const dateString = cellDate.toDateString();
+      const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+      
+      if (isWeekend) {
+        cell.classList.add('day-weekend');
+      }
+      
+      if (cellDate < bookingStart || cellDate > bookingEnd) {
+        cell.className = 'day-disabled';
+      } else {
+        cell.className = 'day-active';
+        
+        if (selectedDates.has(dateString)) {
+          cell.classList.add('day-selected');
+        }
+        
+        cell.addEventListener('click', () => {
+          if (subSchedule && subSchedule.value !== 'custom') {
+            subSchedule.value = 'custom';
+          }
+          toggleDate(dateString);
+        });
+      }
+      
+      subCalendarGrid.appendChild(cell);
+    }
+    
+    updateSummary();
+  }
+
+  function toggleDate(dateStr) {
+    if (selectedDates.has(dateStr)) {
+      selectedDates.delete(dateStr);
+    } else {
+      selectedDates.add(dateStr);
+    }
+    renderCalendar(currentYear, currentMonth);
+  }
+
+  prevMonthBtn?.addEventListener('click', () => {
+    const minMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const currentMonthDate = new Date(currentYear, currentMonth, 1);
+    
+    if (currentMonthDate > minMonthDate) {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar(currentYear, currentMonth);
+    }
+  });
+
+  nextMonthBtn?.addEventListener('click', () => {
+    const maxMonthDate = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    const currentMonthDate = new Date(currentYear, currentMonth, 1);
+    
+    if (currentMonthDate < maxMonthDate) {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    }
+  });
+
+  function updateSummary() {
+    const qty = parseInt(subQty.value) || 1;
+    const count = selectedDates.size;
+    const prodName = subProduct.value;
+    const info = PRODUCTS_INFO[prodName] || { price: 0 };
+    
+    const cost = qty * info.price * count;
+    
+    if (daysCountLabel) daysCountLabel.textContent = count;
+    if (totalCostLabel) totalCostLabel.textContent = `₹${cost}`;
+  }
+
+  function applySchedule(preset) {
+    selectedDates.clear();
+    
+    const durationLimitDate = new Date(bookingStart);
+    durationLimitDate.setDate(bookingStart.getDate() + currentDuration);
+    durationLimitDate.setHours(23,59,59,999);
+    
+    const cursor = new Date(bookingStart);
+    while (cursor <= bookingEnd && cursor <= durationLimitDate) {
+      const dateString = cursor.toDateString();
+      const dayOfWeek = cursor.getDay();
+      
+      if (preset === 'daily') {
+        selectedDates.add(dateString);
+      } else if (preset === 'alternate') {
+        const diffTime = Math.abs(cursor - bookingStart);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays % 2 === 0) {
+          selectedDates.add(dateString);
+        }
+      } else if (preset === 'weekend') {
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          selectedDates.add(dateString);
+        }
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    
+    renderCalendar(currentYear, currentMonth);
+  }
+
+  subSchedule?.addEventListener('change', (e) => {
+    applySchedule(e.target.value);
+  });
+  
+  subProduct?.addEventListener('change', updateSummary);
+  subQty?.addEventListener('input', updateSummary);
+
+  function submitSubscription(withWhatsApp) {
+    if (selectedDates.size === 0) {
+      alert('Please select at least 1 delivery date in the calendar.');
+      return;
+    }
+    
+    const directBtn = document.querySelector('#sub-direct-btn');
+    const whatsappBtn = document.querySelector('#sub-whatsapp-btn');
+    
+    if (directBtn) directBtn.disabled = true;
+    if (whatsappBtn) whatsappBtn.disabled = true;
+    
+    if (withWhatsApp && whatsappBtn) {
+      whatsappBtn.innerHTML = `PROCESSING... <span class="spinner-icon"></span>`;
+    } else if (directBtn) {
+      directBtn.innerHTML = `PROCESSING... <span class="spinner-icon"></span>`;
+    }
+    
+    const name = subName.value.trim();
+    const phone = subPhone.value.trim();
+    const pincode = subPincode.value.trim();
+    const address = subAddress.value.trim();
+    
+    const product = subProduct.value;
+    const qty = parseInt(subQty.value) || 1;
+    const slot = subSlot.value;
+    const schedule = subSchedule.value;
+    
+    const sortedDates = [...selectedDates].map(d => new Date(d)).sort((a,b) => a - b);
+    const startDateFormatted = sortedDates[0]?.toLocaleDateString('en-IN') || '—';
+    const datesList = sortedDates.map(d => d.toLocaleDateString('en-IN'));
+
+    safeStore.set(localStorage, 'samara-name', name);
+    safeStore.set(localStorage, 'samara-mobile', phone);
+    safeStore.set(localStorage, 'samara-pincode', pincode);
+    safeStore.set(localStorage, 'samara-address', address);
+
+    fetch('/api/subscriptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        phone,
+        pincode,
+        address,
+        product_name: product,
+        qty,
+        schedule,
+        delivery_slot: slot,
+        start_date: startDateFormatted,
+        custom_dates: datesList
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) throw new Error(data.message || 'Server error.');
+      
+      const successTitle = document.querySelector('.sub-success-title');
+      const successMsg = document.querySelector('.sub-success-msg');
+      
+      const info = PRODUCTS_INFO[product] || { price: 0 };
+      const totalCost = qty * info.price * sortedDates.length;
+
+      if (withWhatsApp) {
+        const message = `*SAMARA ORGANICS SUBSCRIPTION REGISTRY*
+----------------------------------
+*Subscription ID:* #${data.subscriptionId}
+*Customer Details:*
+• Name: ${name}
+• Phone: +91 ${phone}
+• Address: ${address} (${pincode})
+• Delivery Slot: ${slot}
+
+*Subscription Details:*
+• Product: ${product}
+• Quantity per day: ${qty}
+• Preset Schedule: ${schedule.toUpperCase()}
+• Starting Date: ${startDateFormatted}
+• Total Deliveries: ${sortedDates.length} days
+
+*Estimated Cycle Cost:* ₹${totalCost}
+----------------------------------
+Thank you for choosing Samara Organics! 🌿`;
+
+        const url = `https://wa.me/918077366897?text=${encodeURIComponent(message)}`;
+        
+        setTimeout(() => {
+          window.open(url, '_blank', 'noopener');
+          if (successTitle) successTitle.textContent = "Subscription Logged!";
+          if (successMsg) successMsg.textContent = "Please send the pre-filled message in the WhatsApp window that has opened to confirm your subscription details with us.";
+          finalizeSub();
+        }, 950);
+      } else {
+        setTimeout(() => {
+          if (successTitle) successTitle.textContent = "Subscription Booked!";
+          if (successMsg) successMsg.textContent = `Your subscription #${data.subscriptionId} starting on ${startDateFormatted} has been logged directly. The farm crew will call you on +91 ${phone} to coordinate routing.`;
+          finalizeSub();
+        }, 950);
+      }
+      
+      function finalizeSub() {
+        if (directBtn) {
+          directBtn.disabled = false;
+          directBtn.innerHTML = `CONFIRM SUBSCRIPTION DIRECTLY <span>✓</span>`;
+        }
+        if (whatsappBtn) {
+          whatsappBtn.disabled = false;
+          whatsappBtn.innerHTML = `SUBSCRIBE VIA WHATSAPP <span>→</span>`;
+        }
+        
+        if (subFormContainer) subFormContainer.style.display = 'none';
+        if (subSuccessView) subSuccessView.style.display = 'block';
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Subscription failed: ' + err.message);
+      if (directBtn) {
+        directBtn.disabled = false;
+        directBtn.innerHTML = `CONFIRM SUBSCRIPTION DIRECTLY <span>✓</span>`;
+      }
+      if (whatsappBtn) {
+        whatsappBtn.disabled = false;
+        whatsappBtn.innerHTML = `SUBSCRIBE VIA WHATSAPP <span>→</span>`;
+      }
+    });
+  }
+
+  subForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitSubscription(true);
+  });
+
+  subDirectBtn?.addEventListener('click', () => {
+    if (subForm && subForm.reportValidity()) {
+      submitSubscription(false);
+    }
+  });
+
+  // Farm Tour Modal Controllers & WhatsApp Form Booking
+  (() => {
+    const tourModal = document.querySelector('#tour-modal');
+    const tourHeaderBtn = document.querySelector('#tour-header-btn');
+    const tourModalClose = document.querySelector('#tour-modal-close');
+    const tourForm = document.querySelector('#tour-modal-form');
+    const tourDateInput = document.querySelector('#tour-date');
+    const tourGuestsSelect = document.querySelector('#tour-guests');
+    const tourTotalCostLabel = document.querySelector('#tour-total-cost');
+    
+    if (tourDateInput) {
+      const todayVal = new Date();
+      const todayStr = todayVal.toISOString().split('T')[0];
+      
+      const maxDateVal = new Date();
+      maxDateVal.setDate(maxDateVal.getDate() + 30);
+      const maxStr = maxDateVal.toISOString().split('T')[0];
+      
+      tourDateInput.min = todayStr;
+      tourDateInput.max = maxStr;
+      
+      // Auto popout browser calendar immediately on click or focus
+      ['click', 'focus'].forEach(evt => {
+        tourDateInput.addEventListener(evt, () => {
+          try {
+            tourDateInput.showPicker();
+          } catch (e) {
+            console.error("showPicker not supported", e);
+          }
+        });
+      });
+    }
+
+    // Dynamic cost calculator based on number of guests
+    function updateTourTotalCost() {
+      const guests = parseInt(tourGuestsSelect?.value) || 1;
+      const cost = guests * 99;
+      if (tourTotalCostLabel) {
+        tourTotalCostLabel.textContent = `₹${cost}`;
+      }
+    }
+    tourGuestsSelect?.addEventListener('change', updateTourTotalCost);
+
+    tourHeaderBtn?.addEventListener('click', () => {
+      tourModal?.classList.add('open');
+      tourModal?.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      
+      const nameIn = document.querySelector('#tour-name');
+      const phoneIn = document.querySelector('#tour-phone');
+      if (nameIn) nameIn.value = safeStore.get(localStorage, 'samara-name') || '';
+      if (phoneIn) phoneIn.value = safeStore.get(localStorage, 'samara-mobile') || '';
+      
+      // Reset defaults
+      if (tourGuestsSelect) tourGuestsSelect.value = "1";
+      updateTourTotalCost();
+    });
+
+    function closeTourModal() {
+      tourModal?.classList.remove('open');
+      tourModal?.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    tourModalClose?.addEventListener('click', closeTourModal);
+    tourModal?.querySelector('.modal-backdrop')?.addEventListener('click', closeTourModal);
+
+    tourForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const name = document.querySelector('#tour-name')?.value.trim();
+      const phone = document.querySelector('#tour-phone')?.value.trim();
+      const guests = parseInt(tourGuestsSelect?.value) || 1;
+      const dateVal = tourDateInput?.value;
+      const slot = document.querySelector('#tour-slot')?.value;
+      
+      safeStore.set(localStorage, 'samara-name', name);
+      safeStore.set(localStorage, 'samara-mobile', phone);
+      
+      const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('en-IN') : '';
+      const totalCost = guests * 99;
+      
+      const message = `*SAMARA ORGANICS FARM TOUR BOOKING*
+----------------------------------
+*Customer Details:*
+• Name: ${name}
+• Phone: +91 ${phone}
+• Number of Guests: ${guests}
+• Selected Date: ${formattedDate}
+• Timing Slot: ${slot}
+
+*Booking Ticket Cost:* ₹${totalCost}
+----------------------------------
+We would love to visit your farm! 🌿`;
+
+      const url = `https://wa.me/918077366897?text=${encodeURIComponent(message)}`;
+      
+      window.open(url, '_blank', 'noopener');
+      closeTourModal();
+    });
+  })();
+
+})();

@@ -15,7 +15,7 @@ app.use(express.static('.'));
 const PRODUCTS_INFO = {
   "Organic A2 Milk": { price: 110, unit: "1 L" },
   "Bilona Desi Ghee": { price: 749, unit: "500 ML" },
-  "Traditional Dahi": { price: 99, unit: "500 ML" }
+  "Traditional Dahi": { price: 89, unit: "500 ML" }
 };
 
 // API: Batch Traceability Lookup
@@ -109,6 +109,51 @@ app.post('/api/orders', async (request, response) => {
 
   } catch (error) {
     console.error('Error placing order:', error);
+    response.status(500).json({ success: false, message: 'Server database error.' });
+  }
+});
+
+// API: Save Calendar-Based Subscription
+app.post('/api/subscriptions', async (request, response) => {
+  try {
+    const { name, phone, pincode, address, product_name, qty, schedule, delivery_slot, start_date, custom_dates } = request.body;
+
+    if (!name || !phone || !pincode || !address || !product_name || !qty || !schedule || !delivery_slot) {
+      return response.status(400).json({ success: false, message: 'Required subscription fields are missing.' });
+    }
+
+    // 1. Add or Update User Profile
+    let user = await dbGet('SELECT id FROM users WHERE phone = ?', [phone]);
+    let userId;
+
+    if (user) {
+      userId = user.id;
+      await dbRun(
+        'UPDATE users SET name = ?, pincode = ?, address = ? WHERE id = ?',
+        [name, pincode, address, userId]
+      );
+    } else {
+      const result = await dbRun(
+        'INSERT INTO users (name, phone, pincode, address) VALUES (?, ?, ?, ?)',
+        [name, phone, pincode, address]
+      );
+      userId = result.lastID;
+    }
+
+    // 2. Insert Subscription record
+    const result = await dbRun(
+      'INSERT INTO subscriptions (user_id, product_name, qty, schedule, delivery_slot, start_date, custom_dates, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [userId, product_name, qty, schedule, delivery_slot, start_date || null, custom_dates ? JSON.stringify(custom_dates) : null, 'Active']
+    );
+
+    response.json({
+      success: true,
+      subscriptionId: result.lastID,
+      message: 'Subscription created successfully.'
+    });
+
+  } catch (error) {
+    console.error('Error creating subscription:', error);
     response.status(500).json({ success: false, message: 'Server database error.' });
   }
 });

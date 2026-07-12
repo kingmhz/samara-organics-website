@@ -49,6 +49,9 @@ function initializeDatabase() {
         product_name TEXT NOT NULL,
         qty INTEGER NOT NULL,
         schedule TEXT NOT NULL,
+        delivery_slot TEXT NOT NULL,
+        start_date TEXT,
+        custom_dates TEXT,
         status TEXT DEFAULT 'Active',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id)
