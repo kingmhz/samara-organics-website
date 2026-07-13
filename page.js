@@ -1,8 +1,9 @@
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const saveData = Boolean(navigator.connection?.saveData);
 const loader = document.querySelector('.loader');
-const dismiss = () => { loader?.classList.add('done'); document.body.classList.remove('loading'); };
-addEventListener('load', () => setTimeout(dismiss, reduce || saveData ? 100 : 750), { once: true });
+const loaderStartedAt = performance.now();
+const dismiss = () => { loader?.classList.add('done'); loader?.setAttribute('aria-hidden', 'true'); document.body.classList.remove('loading'); };
+addEventListener('load', () => setTimeout(dismiss, Math.max(0, (reduce || saveData ? 80 : 650) - (performance.now() - loaderStartedAt))), { once: true });
 setTimeout(dismiss, 3000);
 
 if ('IntersectionObserver' in window && !reduce) {
@@ -27,7 +28,7 @@ document.querySelectorAll('nav a').forEach(link => link.addEventListener('click'
 
 const canTilt = matchMedia('(hover:hover) and (pointer:fine)').matches && !reduce && !saveData;
 
-if (canTilt) document.querySelectorAll('[data-tilt], .detail-art, .standard-orbit, .manager-mark').forEach(element => {
+if (canTilt) document.querySelectorAll('[data-tilt], .detail-art').forEach(element => {
   element.addEventListener('pointermove', event => {
     const box = element.getBoundingClientRect(), x=(event.clientX-box.left)/box.width-.5, y=(event.clientY-box.top)/box.height-.5;
     element.style.transform = `perspective(1000px) rotateY(${x*7}deg) rotateX(${-y*7}deg)`;

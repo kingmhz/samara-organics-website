@@ -1,0 +1,51 @@
+services:
+  samara-web:
+    build: .
+    ports:
+      - "4173:4173"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4173
+      DATABASE_PATH: /data/samara.db
+      BACKUP_DIR: /data/backups
+    volumes:
+      - samara-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    init: true
+    restart: unless-stopped
+
+  samara-operations:
+    build: .
+    command: ["node", "scripts/operations-worker.mjs"]
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_PATH: /data/samara.db
+      BACKUP_DIR: /data/backups
+    volumes:
+      - samara-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    init: true
+    restart: unless-stopped
+    depends_on:
+      samara-web:
+        condition: service_healthy
+
+volumes:
+  samara-data:

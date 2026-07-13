@@ -7,6 +7,6 @@
   "background_color": "#082d20",
   "theme_color": "#082d20",
   "icons": [
-    { "src": "assets/samara-logo-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "assets/samara-buffalo-logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any maskable" }
   ]
 }

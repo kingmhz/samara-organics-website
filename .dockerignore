@@ -1,0 +1,16 @@
+node_modules
+.git
+.agents
+.env
+.env.*
+!.env.example
+samara.db
+samara.db-*
+backups
+npm-debug.log*
+assets/samara-mark-source.jpg
+assets/samara-mark-source.webp
+assets/samara-hero-3d-wide.jpg
+assets/samara-farm-hero.jpg
+assets/samara-farm-hero.webp
+assets/samara-logo-mark.png

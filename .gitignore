@@ -1,6 +1,13 @@
 node_modules/
+.env
+.env.local
+.env.production
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
+backups/
+logs/
 .agents/
 .DS_Store
 Thumbs.db

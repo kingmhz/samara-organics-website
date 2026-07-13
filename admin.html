@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
   <title>Samara Organics — Admin Portal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
+    @font-face { font-family:"Cormorant Garamond"; font-style:normal; font-weight:500 700; font-display:swap; src:url("assets/fonts/cormorant-garamond-latin.woff2") format("woff2"); }
+    @font-face { font-family:"Manrope"; font-style:normal; font-weight:400 700; font-display:swap; src:url("assets/fonts/manrope-latin.woff2") format("woff2"); }
     :root {
       --forest: #082d20;
       --forest2: #0d3a29;
@@ -218,6 +220,27 @@
       width: auto;
       margin: 0;
     }
+    .operation-row label { font-size: 9px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+    .operation-row input, .operation-row select { width: 100%; margin-top: 6px; min-height: 40px; padding: 8px; border: 1px solid var(--line); background: var(--cream); }
+    @media (max-width: 900px) { .operation-row { grid-template-columns: 1fr 1fr !important; } .tabs { overflow-x: auto; } }
+    .support-update { display:grid; gap:7px; min-width:220px; }
+    .support-update select, .support-update textarea { width:100%; padding:8px; border:1px solid var(--line); background:var(--cream); font:12px Manrope,sans-serif; }
+    .support-update textarea { min-height:75px; resize:vertical; }
+    .dashboard-head { display:flex; justify-content:space-between; align-items:end; gap:20px; margin-bottom:18px; }
+    .dashboard-head h2 { font:600 34px "Cormorant Garamond"; margin:0; color:var(--forest); }
+    .dashboard-head button { border:1px solid var(--line); background:var(--ivory); min-height:38px; padding:0 14px; font:700 10px Manrope; letter-spacing:.08em; cursor:pointer; }
+    .dashboard-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+    .dashboard-card { background:var(--ivory); border:1px solid var(--line); padding:20px; min-height:105px; }
+    .dashboard-card small { display:block; font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--gold); }
+    .dashboard-card strong { display:block; font:600 34px "Cormorant Garamond"; color:var(--forest); margin-top:10px; }
+    .dashboard-alerts { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:28px; }
+    .dashboard-list { background:var(--ivory); border:1px solid var(--line); padding:18px; font-size:11px; line-height:1.7; }
+    .dashboard-list b { display:block; font:600 20px "Cormorant Garamond"; margin-bottom:8px; }
+    .route-meter { height:5px; background:var(--cream); margin:6px 0 12px; overflow:hidden; }
+    .route-meter i { display:block; height:100%; background:var(--olive); }
+    @media(max-width:900px){.dashboard-grid{grid-template-columns:1fr 1fr}.dashboard-alerts{grid-template-columns:1fr}}
+    .manifest-tools{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:18px}.manifest-tools label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--gold)}.manifest-tools input{display:block;margin-top:6px;min-height:40px;border:1px solid var(--line);background:var(--ivory);padding:0 12px;font:600 12px Manrope}.manifest-tools button{min-height:40px;border:0;background:var(--forest);color:white;padding:0 18px;font:700 10px Manrope;letter-spacing:.09em;cursor:pointer}.manifest-tools button.secondary{background:var(--ivory);border:1px solid var(--line);color:var(--forest)}.manifest-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 18px}.manifest-summary div{background:var(--ivory);border:1px solid var(--line);padding:14px}.manifest-summary small,.manifest-summary strong{display:block}.manifest-summary small{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em}.manifest-summary strong{font:600 27px "Cormorant Garamond";margin-top:6px;color:var(--forest)}.manifest-stock{margin:-4px 0 18px;padding:13px 15px;border:1px solid #b8ccb9;background:#edf6ee;color:#24542d;font-size:12px;line-height:1.55}.manifest-stock.shortage{border-color:#d7a49a;background:#fff0ed;color:#813b2d}.manifest-stock b{display:block;margin-bottom:3px}
+    @media print{body>*{display:none!important}.container{display:block!important;padding:0!important}.container>*{display:none!important}#manifest-panel{display:block!important}.manifest-tools,.tabs{display:none!important}.table-container{box-shadow:none;border:0}header{display:none!important}}
   </style>
 </head>
 <body>
@@ -228,10 +251,23 @@
   </header>
 
   <div class="container">
+    <section aria-labelledby="dashboard-title"><div class="dashboard-head"><div><h2 id="dashboard-title">Operations overview</h2><small id="dashboard-date">Loading live farm data…</small></div><button type="button" id="refresh-dashboard">REFRESH</button></div><div class="dashboard-grid" id="dashboard-cards"></div><div class="dashboard-alerts"><div class="dashboard-list" id="stock-alerts"><b>Inventory</b>Loading…</div><div class="dashboard-list" id="route-utilization"><b>Tomorrow's routes</b>Loading…</div></div></section>
     <div class="tabs">
       <button class="tab-btn active" data-target="orders-panel">ORDERS LOG</button>
+      <button class="tab-btn" data-target="manifest-panel">DELIVERY MANIFEST</button>
       <button class="tab-btn" data-target="subs-panel">SUBSCRIBERS ROSTER</button>
+      <button class="tab-btn" data-target="operations-panel">INVENTORY &amp; ROUTES</button>
+      <button class="tab-btn" data-target="support-panel">CUSTOMER CARE</button>
+      <button class="tab-btn" data-target="audit-panel">AUDIT LOG</button>
       <button class="tab-btn" data-target="batches-panel">TRACEABILITY BATCHES</button>
+    </div>
+
+    <div class="panel" id="manifest-panel">
+      <div class="dashboard-head"><div><h2>Daily delivery manifest</h2><small id="manifest-caption">Choose a delivery date.</small></div></div>
+      <div class="manifest-tools"><label>DELIVERY DATE<input id="manifest-date" type="date"></label><button type="button" id="load-manifest">LOAD MANIFEST</button><button type="button" class="secondary" id="export-manifest" disabled>EXPORT CSV</button><button type="button" class="secondary" id="print-manifest" disabled>PRINT</button></div>
+      <div class="manifest-summary" id="manifest-summary"></div>
+      <div class="manifest-stock" id="manifest-stock" hidden></div>
+      <div class="table-container"><table><thead><tr><th>REFERENCE</th><th>TYPE</th><th>ROUTE &amp; SLOT</th><th>CUSTOMER</th><th>ADDRESS</th><th>ITEMS</th><th>UNITS</th></tr></thead><tbody id="manifest-tbody"><tr><td colspan="7" class="loading-text">No manifest loaded.</td></tr></tbody></table></div>
     </div>
 
     <!-- Panel 1: Orders -->
@@ -269,21 +305,31 @@
               <th>QTY</th>
               <th>SLOT</th>
               <th>SCHEDULE</th>
-              <th>START DATE</th>
+              <th>PLAN DATES</th>
               <th>DATES / DETAILS</th>
               <th>REGISTERED</th>
             </tr>
           </thead>
           <tbody id="subs-tbody">
             <tr>
-              <td colspan="6" class="loading-text">Loading subscriptions...</td>
+              <td colspan="9" class="loading-text">Loading subscriptions...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Panel 3: Batches & Quality logs -->
+    <div class="panel" id="support-panel"><div class="table-container"><table><thead><tr><th>REFERENCE</th><th>CUSTOMER</th><th>ISSUE</th><th>MESSAGE</th><th>STATUS &amp; RESPONSE</th></tr></thead><tbody id="support-tbody"><tr><td colspan="5" class="loading-text">Loading support requests…</td></tr></tbody></table></div></div>
+
+    <div class="panel" id="audit-panel"><div class="table-container"><table><thead><tr><th>TIME</th><th>ACTOR</th><th>ACTION</th><th>ENTITY</th><th>DETAILS</th><th>REQUEST</th></tr></thead><tbody id="audit-tbody"><tr><td colspan="6" class="loading-text">Loading audit trail…</td></tr></tbody></table></div></div>
+
+    <div class="panel" id="operations-panel">
+      <div class="form-card" style="margin-bottom:24px"><h3>Product Catalog</h3><p style="font-size:12px;color:var(--muted)">These prices, units and availability are authoritative for checkout and subscriptions.</p><div id="catalog-operations" class="loading-text">Loading catalog…</div></div>
+      <div class="form-card" style="margin-bottom:24px"><h3>Available Inventory</h3><p style="font-size:12px;color:var(--muted)">Orders reserve this stock atomically. Cancelling an order or failing its payment returns the quantity.</p><div id="inventory-operations" class="loading-text">Loading inventory…</div></div>
+      <div class="form-card"><h3>Route Capacity</h3><p style="font-size:12px;color:var(--muted)">Limits apply per PIN prefix, delivery slot and delivery date.</p><div id="route-operations" class="loading-text">Loading routes…</div></div>
+    </div>
+
+    <!-- Panel 4: Batches & Quality logs -->
     <div class="panel" id="batches-panel">
       <div class="form-grid">
         <div class="form-card">
@@ -352,6 +398,18 @@
   </div>
 
   <script>
+    const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+    const orderTransitions = {
+      'Pending': ['Confirmed', 'Cancelled'],
+      'Awaiting Payment Verification': ['Confirmed', 'Payment Failed', 'Cancelled'],
+      'Confirmed': ['Out for Delivery', 'Cancelled'],
+      'Out for Delivery': ['Delivered'],
+      'Delivered': [], 'Cancelled': [], 'Payment Failed': []
+    };
+    const statusOptions = current => [current, ...(orderTransitions[current] || [])].map(status => `<option value="${escapeHtml(status)}" ${status === current ? 'selected' : ''}>${escapeHtml(status)}</option>`).join('');
+
     // Tab switching
     const tabBtns = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.panel');
@@ -361,8 +419,129 @@
         panels.forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(btn.dataset.target).classList.add('active');
+        if (btn.dataset.target === 'operations-panel') loadOperations();
+        if (btn.dataset.target === 'manifest-panel') loadManifest();
+        if (btn.dataset.target === 'support-panel') loadSupportTickets();
+        if (btn.dataset.target === 'audit-panel') loadAuditLog();
       });
     });
+
+    let currentManifest = null;
+    const manifestDate = document.getElementById('manifest-date');
+    const indiaCalendarDate = (offsetDays = 0) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + offsetDays * 86400000));
+    manifestDate.min = indiaCalendarDate();
+    manifestDate.max = indiaCalendarDate(180);
+    manifestDate.value = indiaCalendarDate(1);
+    async function loadManifest() {
+      const tbody = document.getElementById('manifest-tbody');
+      tbody.innerHTML = '<tr><td colspan="7" class="loading-text">Building route manifest…</td></tr>';
+      const response = await fetch(`/api/admin/delivery-manifest?date=${encodeURIComponent(manifestDate.value)}`, { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok || !data.success) { tbody.innerHTML = `<tr><td colspan="7">${escapeHtml(data.message || 'Unable to load manifest.')}</td></tr>`; return; }
+      currentManifest = data;
+      document.getElementById('manifest-caption').textContent = `Fulfilment plan for ${data.deliveryDate}`;
+      document.getElementById('manifest-summary').innerHTML = [['STOPS', data.summary.stops], ['UNITS', data.summary.units], ['ORDERS', data.summary.orders], ['SUBSCRIPTIONS', data.summary.subscriptions]].map(([label, value]) => `<div><small>${label}</small><strong>${escapeHtml(value)}</strong></div>`).join('');
+      const stockBox = document.getElementById('manifest-stock');
+      stockBox.hidden = data.stock.length === 0;
+      stockBox.classList.toggle('shortage', !data.stockSufficient);
+      stockBox.innerHTML = data.stock.length ? `<b>${data.stockSufficient ? 'SUBSCRIPTION STOCK COVERED' : 'STOCK SHORTAGE — REPLENISH BEFORE PACKING'}</b>${data.stock.map(item => `${escapeHtml(item.productName)}: ${escapeHtml(item.requiredSubscriptionUnits)} recurring units required · ${escapeHtml(item.availableUncommittedQty)} uncommitted in inventory${item.shortageQty ? ` · <strong>${escapeHtml(item.shortageQty)} SHORT</strong>` : ''}`).join('<br>')}` : '';
+      tbody.innerHTML = data.entries.length ? data.entries.map(entry => `<tr><td><b>${escapeHtml(entry.reference)}</b></td><td>${escapeHtml(entry.type)}</td><td>PIN ${escapeHtml(entry.routePrefix)}…<br><small>${escapeHtml(entry.deliverySlot)}</small></td><td>${escapeHtml(entry.name)}<br><a href="tel:${escapeHtml(entry.phone)}">${escapeHtml(entry.phone)}</a></td><td style="max-width:280px;white-space:normal">${escapeHtml(entry.address)}<br>${escapeHtml(entry.pincode)}</td><td>${entry.items.map(item => `${escapeHtml(item.product)} × ${escapeHtml(item.qty)}${item.unit ? ` ${escapeHtml(item.unit)}` : ''}`).join('<br>')}</td><td><b>${escapeHtml(entry.units)}</b></td></tr>`).join('') : '<tr><td colspan="7" class="loading-text">No deliveries scheduled for this date.</td></tr>';
+      document.getElementById('export-manifest').disabled = false;
+      document.getElementById('print-manifest').disabled = false;
+    }
+    document.getElementById('load-manifest').addEventListener('click', () => loadManifest().catch(error => alert(error.message)));
+    document.getElementById('print-manifest').addEventListener('click', () => window.print());
+    document.getElementById('export-manifest').addEventListener('click', () => {
+      if (!currentManifest) return;
+      const csvCell = value => {
+        let text = String(value ?? '');
+        if (/^[\s]*[=+\-@]/.test(text)) text = `'${text}`;
+        return `"${text.replaceAll('"', '""')}"`;
+      };
+      const rows = [['Reference', 'Type', 'PIN', 'Route prefix', 'Delivery slot', 'Customer', 'Phone', 'Address', 'Items', 'Units'], ...currentManifest.entries.map(entry => [entry.reference, entry.type, entry.pincode, entry.routePrefix, entry.deliverySlot, entry.name, entry.phone, entry.address, entry.items.map(item => `${item.product} x ${item.qty}${item.unit ? ` ${item.unit}` : ''}`).join('; '), entry.units])];
+      const blob = new Blob([rows.map(row => row.map(csvCell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `samara-deliveries-${currentManifest.deliveryDate}.csv`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    });
+
+    async function loadOperations() {
+      const response = await fetch('/api/admin/operations');
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || 'Unable to load operations.');
+      document.getElementById('catalog-operations').innerHTML = data.catalog.map(item => `<form class="operation-row" data-catalog="${escapeHtml(item.product_name)}" style="display:grid;grid-template-columns:1fr 100px 100px 85px 85px 90px;gap:10px;align-items:end;margin:12px 0"><b>${escapeHtml(item.product_name)}</b><label>PRICE ₹<input name="price" type="number" min="1" value="${escapeHtml(item.price)}" required></label><label>UNIT<input name="unit" maxlength="30" value="${escapeHtml(item.unit)}" required></label><label>ORDER<input name="sort_order" type="number" min="0" value="${escapeHtml(item.sort_order)}" required></label><label>ACTIVE<select name="active"><option value="1" ${item.active ? 'selected' : ''}>Yes</option><option value="0" ${!item.active ? 'selected' : ''}>No</option></select></label><button class="form-submit-btn">SAVE</button></form>`).join('');
+      document.getElementById('inventory-operations').innerHTML = data.inventory.map(item => `<form class="operation-row" data-inventory="${escapeHtml(item.product_name)}" style="display:grid;grid-template-columns:minmax(150px,1fr) 110px 110px 120px 100px 110px;gap:10px;align-items:end;margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--line)"><div><b>${escapeHtml(item.product_name)}</b><small style="display:block;margin-top:5px;color:var(--muted)">Current stock: ${escapeHtml(item.available_qty)}</small></div><label>EXACT TOTAL<input name="available_qty" type="number" min="0" max="100000" value="${escapeHtml(item.available_qty)}" required></label><label>LOW STOCK<input name="low_stock_threshold" type="number" min="0" max="100000" value="${escapeHtml(item.low_stock_threshold)}" required></label><label>ADD / REMOVE<input name="adjustment" type="number" min="-100000" max="100000" placeholder="+50 or -10"></label><button class="form-submit-btn" name="inventory_action" value="set">SET TOTAL</button><button class="form-submit-btn" name="inventory_action" value="adjust">ADJUST STOCK</button></form>`).join('');
+      document.getElementById('route-operations').innerHTML = data.routes.map(route => `<form class="operation-row" data-route="${escapeHtml(route.pincode_prefix)}" style="display:grid;grid-template-columns:90px 1fr 100px 100px 85px 90px;gap:10px;align-items:end;margin:12px 0"><b>PIN ${escapeHtml(route.pincode_prefix)}…</b><input name="delivery_slot" type="hidden" value="${escapeHtml(route.delivery_slot)}"><span style="font-size:11px">${escapeHtml(route.delivery_slot)}</span><label>ORDERS<input name="max_orders" type="number" min="0" value="${escapeHtml(route.max_orders)}" required></label><label>UNITS<input name="max_units" type="number" min="0" value="${escapeHtml(route.max_units)}" required></label><label>ACTIVE<select name="active"><option value="1" ${route.active ? 'selected' : ''}>Yes</option><option value="0" ${!route.active ? 'selected' : ''}>No</option></select></label><button class="form-submit-btn">SAVE</button></form>`).join('');
+    }
+
+    document.getElementById('operations-panel').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.target;
+      const isInventory = form.dataset.inventory;
+      const isCatalog = form.dataset.catalog;
+      const body = Object.fromEntries(new FormData(form));
+      const inventoryAction = isInventory ? event.submitter?.value : null;
+      if (isCatalog) { body.price = Number(body.price); body.sort_order = Number(body.sort_order); body.active = body.active === '1'; }
+      else if (isInventory && inventoryAction === 'adjust') {
+        body.delta = Number(body.adjustment);
+        body.note = 'Manual adjustment from the administration portal';
+        if (!Number.isInteger(body.delta) || body.delta === 0) return alert('Enter a non-zero whole number in ADD / REMOVE.');
+      }
+      else if (isInventory) { body.available_qty = Number(body.available_qty); body.low_stock_threshold = Number(body.low_stock_threshold); }
+      else { body.max_orders = Number(body.max_orders); body.max_units = Number(body.max_units); body.active = body.active === '1'; }
+      const path = isCatalog ? `/api/admin/catalog/${encodeURIComponent(isCatalog)}` : isInventory ? `/api/admin/inventory/${encodeURIComponent(isInventory)}${inventoryAction === 'adjust' ? '/adjust' : ''}` : `/api/admin/routes/${encodeURIComponent(form.dataset.route)}`;
+      const response = await fetch(path, { method: isInventory && inventoryAction === 'adjust' ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await response.json();
+      if (!response.ok || !data.success) return alert(data.message || 'Update failed.');
+      alert(data.message);
+      loadOperations();
+    });
+
+    async function loadSupportTickets() {
+      const tbody = document.getElementById('support-tbody');
+      const response = await fetch('/api/admin/support-tickets');
+      const data = await response.json();
+      if (!response.ok || !data.success) { tbody.innerHTML = `<tr><td colspan="5">${escapeHtml(data.message || 'Unable to load support requests.')}</td></tr>`; return; }
+      tbody.innerHTML = data.tickets.length ? data.tickets.map(ticket => `<tr><td><b>${escapeHtml(ticket.public_reference)}</b><br><small>${escapeHtml(new Date(ticket.created_at).toLocaleString('en-IN'))}</small></td><td>${escapeHtml(ticket.name)}<br>${escapeHtml(ticket.phone)}<br>${escapeHtml(ticket.email || '')}</td><td>${escapeHtml(ticket.category)}<br><small>${escapeHtml(ticket.order_reference || 'No order reference')}</small></td><td style="max-width:320px;white-space:normal">${escapeHtml(ticket.message)}</td><td><form class="support-update" data-ticket="${ticket.id}"><select name="status"><option ${ticket.status === 'Received' ? 'selected' : ''}>Received</option><option ${ticket.status === 'In Review' ? 'selected' : ''}>In Review</option><option ${ticket.status === 'Waiting for Customer' ? 'selected' : ''}>Waiting for Customer</option><option ${ticket.status === 'Resolved' ? 'selected' : ''}>Resolved</option><option ${ticket.status === 'Closed' ? 'selected' : ''}>Closed</option></select><textarea name="resolution_note" maxlength="2000" placeholder="Customer-visible response">${escapeHtml(ticket.resolution_note || '')}</textarea><button class="form-submit-btn">SAVE</button></form></td></tr>`).join('') : '<tr><td colspan="5" class="loading-text">No support requests.</td></tr>';
+    }
+
+    document.getElementById('support-panel').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.target;
+      const response = await fetch(`/api/admin/support-tickets/${form.dataset.ticket}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+      const data = await response.json();
+      if (!response.ok || !data.success) return alert(data.message || 'Update failed.');
+      loadSupportTickets();
+    });
+
+    async function loadDashboard() {
+      const response = await fetch('/api/admin/dashboard', { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || 'Unable to load dashboard.');
+      const count = (rows, statuses) => rows.filter(row => statuses.includes(row.status)).reduce((sum, row) => sum + row.count, 0);
+      const cards = [
+        ['TOTAL ORDERS', data.value.total_orders],
+        ['ACTIVE SUBSCRIPTIONS', count(data.subscriptions, ['Active', 'Paused'])],
+        ['OPEN SUPPORT', count(data.support, ['Received', 'In Review', 'Waiting for Customer'])],
+        ['GROSS ORDER VALUE', `₹${Number(data.value.gross_order_value).toLocaleString('en-IN')}`]
+      ];
+      document.getElementById('dashboard-cards').innerHTML = cards.map(([label, value]) => `<div class="dashboard-card"><small>${label}</small><strong>${escapeHtml(value)}</strong></div>`).join('');
+      document.getElementById('dashboard-date').textContent = `Route plan for ${data.deliveryDate} · updated ${new Date(data.generatedAt).toLocaleTimeString('en-IN')}`;
+      if (!currentManifest) manifestDate.value = data.deliveryDate;
+      document.getElementById('stock-alerts').innerHTML = `<b>Inventory</b>${data.inventory.map(item => `<div style="color:${item.low_stock ? '#a94442' : 'inherit'}">${escapeHtml(item.product_name)} — <strong>${item.available_qty}</strong>${item.low_stock ? ' · LOW STOCK' : ''}</div>`).join('')}`;
+      document.getElementById('route-utilization').innerHTML = `<b>Tomorrow's routes</b>${data.routes.map(route => `<div>PIN ${escapeHtml(route.pincode_prefix)}… · ${escapeHtml(route.delivery_slot)}<br>${route.booked_orders}/${route.max_orders} orders · ${route.booked_units}/${route.max_units} units<div class="route-meter"><i style="width:${Math.min(100, Math.max(route.orderUtilization, route.unitUtilization))}%"></i></div></div>`).join('') || 'No active routes.'}`;
+    }
+    document.getElementById('refresh-dashboard').addEventListener('click', () => loadDashboard().catch(error => alert(error.message)));
+
+    async function loadAuditLog() {
+      const tbody = document.getElementById('audit-tbody');
+      const response = await fetch('/api/admin/audit-log?limit=200', { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok || !data.success) { tbody.innerHTML = `<tr><td colspan="6">${escapeHtml(data.message || 'Unable to load audit trail.')}</td></tr>`; return; }
+      tbody.innerHTML = data.entries.length ? data.entries.map(entry => `<tr><td>${escapeHtml(new Date(entry.created_at).toLocaleString('en-IN'))}</td><td>${escapeHtml(entry.actor)}</td><td>${escapeHtml(entry.action)}</td><td>${escapeHtml(entry.entity_type)} ${escapeHtml(entry.entity_id)}</td><td><code>${escapeHtml(JSON.stringify(entry.details))}</code></td><td><small>${escapeHtml(entry.request_id)}</small></td></tr>`).join('') : '<tr><td colspan="6" class="loading-text">No audited changes yet.</td></tr>';
+    }
 
     // Load Orders
     function loadOrders() {
@@ -381,7 +560,7 @@
             const dateStr = new Date(order.created_at).toLocaleString('en-IN');
             const itemsHtml = order.items.map(it => {
               const subLabel = it.delivery !== 'one-time' ? ` <strong style="color:var(--olive)">[${it.delivery}]</strong>` : '';
-              return `• ${it.qty} x ${it.name} (${it.unit})${subLabel}`;
+              return `• ${escapeHtml(it.qty)} x ${escapeHtml(it.name)} (${escapeHtml(it.unit)})${subLabel}`;
             }).join('<br>');
             
             const paymentDetails = `<b>${order.payment_method}</b>${order.utr ? `<br><small style="color:var(--muted)">UTR: ${order.utr}</small>` : ''}`;
@@ -390,22 +569,15 @@
               <tr>
                 <td><b>#${order.id}</b></td>
                 <td>
-                  <strong>${order.name}</strong><br>
-                  <small style="color:var(--muted)">+91 ${order.phone}</small><br>
-                  <small style="color:var(--muted)">${order.address} (${order.pincode})</small>
+                  <strong>${escapeHtml(order.name)}</strong><br>
+                  <small style="color:var(--muted)">+91 ${escapeHtml(order.phone)}</small><br>
+                  <small style="color:var(--muted)">${escapeHtml(order.address)} (${escapeHtml(order.pincode)})</small>
                 </td>
                 <td>${itemsHtml}</td>
                 <td>${paymentDetails}<br><b>₹${order.total_amount}</b></td>
-                <td><small>${order.delivery_slot}</small><br><span style="color:var(--muted); font-size:10px;">${dateStr}</span></td>
+                <td><b>${escapeHtml(order.delivery_date || 'Date pending')}</b><br><small>${escapeHtml(order.delivery_slot)}</small><br><span style="color:var(--muted); font-size:10px;">Placed ${dateStr}</span></td>
                 <td>
-                  <select class="status-select" data-id="${order.id}">
-                    <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                    <option value="Awaiting Payment Verification" ${order.status === 'Awaiting Payment Verification' ? 'selected' : ''}>Awaiting Verification</option>
-                    <option value="Confirmed" ${order.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                    <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
-                    <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                    <option value="Payment Failed" ${order.status === 'Payment Failed' ? 'selected' : ''}>Payment Failed</option>
-                  </select>
+                  <select class="status-select" data-id="${order.id}" ${!(orderTransitions[order.status] || []).length ? 'disabled' : ''}>${statusOptions(order.status)}</select>
                 </td>
               </tr>
             `;
@@ -454,7 +626,7 @@
               try {
                 const datesArr = JSON.parse(sub.custom_dates);
                 if (Array.isArray(datesArr) && datesArr.length > 0) {
-                  customDatesText = `<details><summary>${datesArr.length} days selected</summary><div style="max-width:200px; max-height:80px; overflow-y:auto; font-size:10px; color:var(--muted); line-height:1.4; margin-top:5px; border-top:1px dashed var(--line); padding-top:4px;">${datesArr.join(', ')}</div></details>`;
+                  customDatesText = `<details><summary>${datesArr.length} days selected</summary><div style="max-width:200px; max-height:80px; overflow-y:auto; font-size:10px; color:var(--muted); line-height:1.4; margin-top:5px; border-top:1px dashed var(--line); padding-top:4px;">${datesArr.map(escapeHtml).join(', ')}</div></details>`;
                 }
               } catch (e) {
                 console.error('Error parsing custom dates:', e);
@@ -464,15 +636,15 @@
               <tr>
                 <td><b>#${sub.id}</b></td>
                 <td>
-                  <strong>${sub.name}</strong><br>
-                  <small style="color:var(--muted)">+91 ${sub.phone}</small><br>
-                  <small style="color:var(--muted)">${sub.address || ''} (${sub.pincode || ''})</small>
+                  <strong>${escapeHtml(sub.name)}</strong><br>
+                  <small style="color:var(--muted)">+91 ${escapeHtml(sub.phone)}</small><br>
+                  <small style="color:var(--muted)">${escapeHtml(sub.address || '')} (${escapeHtml(sub.pincode || '')})</small>
                 </td>
-                <td><b>${sub.product_name}</b></td>
-                <td>${sub.qty}</td>
-                <td><small>${sub.delivery_slot || '—'}</small></td>
-                <td><span class="status-badge status-Confirmed">${sub.schedule}</span></td>
-                <td><small>${sub.start_date || '—'}</small></td>
+                <td><b>${escapeHtml(sub.product_name)}</b></td>
+                <td>${escapeHtml(sub.qty)}</td>
+                <td><small>${escapeHtml(sub.delivery_slot || '—')}</small></td>
+                <td><span class="status-badge status-Confirmed">${escapeHtml(sub.schedule)}</span></td>
+                <td><small>${escapeHtml(sub.start_date || '—')}${sub.end_date ? ` → ${escapeHtml(sub.end_date)}` : ' → ongoing'}</small></td>
                 <td>${customDatesText}</td>
                 <td><small>${dateStr}</small></td>
               </tr>
@@ -522,7 +694,7 @@
         status: document.getElementById('webhook-status').value
       };
 
-      fetch('/api/webhooks/payment', {
+      fetch('/api/admin/payments/simulate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -539,6 +711,7 @@
     });
 
     // Initial load
+    loadDashboard().catch(error => alert(error.message));
     loadOrders();
     loadSubscriptions();
   </script>

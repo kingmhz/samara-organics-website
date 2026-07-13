@@ -1,9 +1,27 @@
 {
   "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "preview": "node preview-server.mjs",
+    "backup": "node scripts/backup-db.mjs",
+    "maintain": "node scripts/maintain-db.mjs",
+    "operations": "node scripts/operations-worker.mjs",
+    "build": "node scripts/build-assets.mjs",
+    "test": "node tests/static-audit.mjs && node tests/date-handling.mjs && node tests/config.mjs && node tests/operations-config.mjs && node tests/backup.mjs && node tests/smoke.mjs",
+    "test:browser": "node tests/browser-accessibility.mjs",
+    "check": "node --check server.js && node --check database.js && node --check script.js && node --check commerce.js && node --check farm-tour.js && node --check subscription-booking.js && node --check support.js && node --check manage-subscription.js && node --check page.js && node --check tracking.js && node --check service-worker.js && node --check scripts/build-assets.mjs && node --check scripts/backup-db.mjs && node --check scripts/maintain-db.mjs && node --check scripts/operations-worker.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
+    "compression": "^1.8.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "sharp": "^0.35.3",
     "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
