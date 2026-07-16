@@ -1,8 +1,13 @@
 FROM node:22-bookworm-slim AS builder
 
 WORKDIR /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
-RUN npm ci
+# sqlite3 is a native module. Compile it against the same Debian/glibc
+# baseline used by the runtime image instead of trusting a newer prebuild.
+RUN npm_config_build_from_source=true npm ci
 COPY . .
 RUN npm run build && npm test && npm prune --omit=dev
 
