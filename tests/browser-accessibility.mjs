@@ -31,7 +31,6 @@ application?.stderr.on('data', chunk => { applicationOutput += chunk; });
 let applicationExit;
 application?.once('exit', (code, signal) => { applicationExit = { code, signal }; });
 
-const port = 9300 + Math.floor(Math.random() * 300);
 const profile = await mkdtemp(join(tmpdir(), 'samara-chrome-'));
 const chrome = spawn(chromePath, [
   '--headless=new',
@@ -43,7 +42,8 @@ const chrome = spawn(chromePath, [
   '--no-first-run',
   '--no-default-browser-check',
   '--no-sandbox',
-  `--remote-debugging-port=${port}`,
+  '--remote-debugging-address=127.0.0.1',
+  '--remote-debugging-port=0',
   `--user-data-dir=${profile}`,
   'about:blank'
 ], { stdio: ['ignore', 'pipe', 'pipe'] });
@@ -55,12 +55,16 @@ chrome.once('exit', (code, signal) => { chromeExit = { code, signal }; });
 
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 async function waitForChrome() {
-  for (let attempt = 0; attempt < 200; attempt += 1) {
+  for (let attempt = 0; attempt < 400; attempt += 1) {
     if (chromeExit) throw new Error(`Chrome exited before DevTools became ready (${JSON.stringify(chromeExit)}).\n${chromeOutput}`);
-    try {
-      const response = await fetch(`http://127.0.0.1:${port}/json/version`);
-      if (response.ok) return;
-    } catch { /* Chrome is starting. */ }
+    const match = chromeOutput.match(/DevTools listening on ws:\/\/(?:127\.0\.0\.1|\[::1\]):(\d+)\//);
+    if (match) {
+      const debuggingPort = Number(match[1]);
+      try {
+        const response = await fetch(`http://127.0.0.1:${debuggingPort}/json/version`);
+        if (response.ok) return debuggingPort;
+      } catch { /* DevTools printed its address before accepting requests. */ }
+    }
     await delay(100);
   }
   throw new Error(`Chrome DevTools did not become ready.\n${chromeOutput}`);
@@ -81,8 +85,8 @@ async function waitForApplication() {
 let socket;
 try {
   await waitForApplication();
-  await waitForChrome();
-  const target = await (await fetch(`http://127.0.0.1:${port}/json/new?${baseUrl}/`, { method: 'PUT' })).json();
+  const debuggingPort = await waitForChrome();
+  const target = await (await fetch(`http://127.0.0.1:${debuggingPort}/json/new?${baseUrl}/`, { method: 'PUT' })).json();
   socket = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
   let sequence = 0;
