@@ -8,6 +8,12 @@ node_modules/
 *.db-wal
 backups/
 logs/
+*.log
+.server-*
+.release-*
+.browser-server*
+.chrome-*
+.test-*
 .agents/
 .DS_Store
 Thumbs.db

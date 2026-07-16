@@ -2,48 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Samara Organics — farm-fresh, locally handled and batch-traceable dairy serving Aligarh and Bulandshahr.">
-  <meta name="theme-color" content="#082d20"><meta property="og:title" content="Samara Organics — Pure by nature"><meta property="og:description" content="Farm-fresh, locally handled and batch-traceable dairy from western Uttar Pradesh."><meta property="og:image" content="https://samaraorganics.in/assets/samara-hero-3d-wide.webp"><meta property="og:image:alt" content="Samara Organics farm-fresh dairy"><meta property="og:url" content="https://samaraorganics.in/"><meta property="og:type" content="website">
+  <script>
+    // Run before layout so Chrome cannot restore a refreshed homepage to an old
+    // anchor or saved scroll offset before the deferred application script starts.
+    (() => {
+      const navigation = performance.getEntriesByType?.('navigation')?.[0];
+      if (navigation?.type !== 'reload') return;
+      document.documentElement.dataset.reloadFromTop = 'true';
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      if (location.hash) history.replaceState(null, '', `${location.pathname}${location.search}`);
+      scrollTo(0, 0);
+    })();
+  </script>
+  <meta name="description" content="Samara Organics — farm-fresh, locally handled dairy with transparent batch records, serving Aligarh and Bulandshahr.">
+  <meta name="theme-color" content="#082d20"><meta property="og:title" content="Samara Organics — Pure by nature"><meta property="og:description" content="Farm-fresh, locally handled dairy with transparent batch records from western Uttar Pradesh."><meta property="og:image" content="https://samaraorganics.in/assets/samara-heritage-hero.jpg"><meta property="og:image:alt" content="Samara Organics Murrah buffalo farm at sunrise"><meta property="og:url" content="https://samaraorganics.in/"><meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Samara Organics — Pure by nature"><meta name="twitter:description" content="Farm-fresh, locally handled dairy with transparent batch records from western Uttar Pradesh."><meta name="twitter:image" content="https://samaraorganics.in/assets/samara-heritage-hero.jpg"><meta name="twitter:image:alt" content="Samara Organics Murrah buffalo farm at sunrise">
   <link rel="canonical" href="https://samaraorganics.in/">
-  <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/samara-mark.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/samara-hero-3d-wide.webp" as="image" fetchpriority="high"><link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin><noscript><style>.loader{display:none!important}body.loading{overflow:auto!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
+  <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/samara-heritage-logo.jpg" type="image/jpeg">
+  <link rel="preload" href="assets/samara-heritage-hero.jpg" as="image" fetchpriority="high"><link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin><noscript><style>.loader{display:none!important}body.loading{overflow:auto!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <title>Samara Organics — Pure by nature</title>
-  <link rel="stylesheet" href="assets/build/styles.1f960df787.min.css">
+  <link rel="stylesheet" href="assets/build/styles.406d414b24.min.css">
 </head>
 <body class="loading">
   <a class="skip-link" href="#home">Skip to main content</a>
-  <div class="loader" id="loader" role="status" aria-label="Loading Samara Organics"><div class="loader-particles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="loader-scene"><div class="loader-ring ring-a"></div><div class="loader-ring ring-b"></div><div class="loader-logo-wrapper"><div class="loader-shimmer"></div><img src="assets/samara-buffalo-logo.webp" alt="Samara Organics Logo" class="loader-logo-img"></div><div class="loader-shadow"></div></div><div class="loader-word"><b><span class="ltr" style="--i:0">S</span><span class="ltr" style="--i:1">A</span><span class="ltr" style="--i:2">M</span><span class="ltr" style="--i:3">A</span><span class="ltr" style="--i:4">R</span><span class="ltr" style="--i:5">A</span></b><small>ORGANICS</small></div><div class="loader-progress"><i></i></div><p>PURE BY NATURE • HONEST BY CHOICE</p></div>
-  <div class="noise"></div><div class="cursor-glow"></div>
+  <div class="loader" id="loader" role="status" aria-label="Loading Samara Organics"><div class="loader-particles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="loader-scene"><div class="loader-ring ring-a"></div><div class="loader-ring ring-b"></div><div class="loader-logo-wrapper"><div class="loader-shimmer"></div><img src="assets/samara-heritage-logo.jpg" alt="Samara Organics buffalo and leaf wordmark" class="loader-logo-img" width="1254" height="1254"></div><div class="loader-shadow"></div></div><div class="loader-word"><b><span class="ltr" style="--i:0">S</span><span class="ltr" style="--i:1">A</span><span class="ltr" style="--i:2">M</span><span class="ltr" style="--i:3">A</span><span class="ltr" style="--i:4">R</span><span class="ltr" style="--i:5">A</span></b><small>ORGANICS</small></div><div class="loader-progress"><i></i></div><p>PURE BY NATURE • HONEST BY CHOICE</p></div>
+  <div class="noise"></div><div class="cursor-glow"></div><div class="site-notice" id="site-notice" role="status" aria-live="polite" aria-atomic="true"></div>
   <header>
-    <a class="logo" href="#home"><img src="assets/samara-buffalo-logo.webp" alt="Samara Organics" class="logo-img"><div class="logo-text"><b>SAMARA</b><span>ORGANICS</span></div></a>
-    <nav><a href="#products">Products</a><a href="#story">Our story</a><a href="#promise">Our promise</a><a href="#contact">Contact</a></nav>
-    <button type="button" class="nav-subscribe-btn" id="subscribe-header-btn">Subscribe <span>✦</span></button><button type="button" class="nav-tour-btn" id="tour-header-btn">Farm Tour</button><button type="button" class="nav-cart-btn" aria-label="Open cart"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg><span class="cart-count">0</span></button><button class="menu" aria-label="Open navigation" aria-expanded="false"><i></i><i></i></button>
+    <a class="logo" href="#home"><img src="assets/samara-heritage-logo.jpg" alt="Samara Organics buffalo and leaf wordmark" class="logo-img" width="1254" height="1254"><div class="logo-text"><b>SAMARA</b><span>ORGANICS</span></div></a>
+    <nav id="primary-navigation"><a href="products.html">Products</a><a href="about.html#story">Our story</a><a href="about.html#promise">Our promise</a><a href="#contact">Contact</a></nav>
+    <button type="button" class="nav-subscribe-btn" id="subscribe-header-btn">Subscribe <span>✦</span></button><button type="button" class="nav-tour-btn" id="tour-header-btn">Farm Tour</button><button type="button" class="nav-cart-btn" aria-label="Open cart"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg><span class="cart-count">0</span></button><button type="button" class="menu" aria-label="Open navigation" aria-expanded="false" aria-controls="primary-navigation"><i></i><i></i></button>
   </header>
 
   <main id="home">
     <section class="hero">
       <div class="hero-image" data-depth=".025"></div><div class="hero-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div><div class="hero-shade"></div>
       <div class="orb orb-one" data-depth=".07"></div><div class="orb orb-two" data-depth="-.04"></div>
-      <div class="hero-copy enter"><p class="kicker"><span></span> FARM-CRAFTED IN WESTERN UTTAR PRADESH</p><h1>Pure by nature.<br><em>Honest by choice.</em></h1><p class="intro">Farm-fresh dairy from our Murrah buffaloes—locally handled, traceable by batch and made with deep care for the animals and your family.</p><div class="actions"><a class="btn gold" href="#products">Explore our range <span>→</span></a></div></div>
+      <div class="hero-copy enter"><p class="kicker"><span></span> FARM-CRAFTED IN WESTERN UTTAR PRADESH</p><h1>Pure by nature.<br><em>Honest by choice.</em></h1><p class="intro">Farm-fresh dairy from our Murrah buffaloes—locally handled, designed for transparent batch records and made with deep care for the animals and your family.</p><div class="actions"><a class="btn gold" href="#products">Explore our range <span>→</span></a></div></div>
 
       <div class="scroll">SCROLL TO DISCOVER <span>↓</span></div>
     </section>
 
-    <section class="marquee" aria-label="Brand values"><div>FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH TRACEABLE <i>✦</i> DIRECT FROM FARM <i>✦</i> FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH TRACEABLE <i>✦</i> DIRECT FROM FARM <i>✦</i> FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH TRACEABLE <i>✦</i> DIRECT FROM FARM <i>✦</i> FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH TRACEABLE <i>✦</i> DIRECT FROM FARM <i>✦</i></div></section>
+    <section class="marquee" aria-label="Brand values"><div>FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH RECORDS <i>✦</i> DIRECT FROM FARM <i>✦</i> FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH RECORDS <i>✦</i> DIRECT FROM FARM <i>✦</i> FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH RECORDS <i>✦</i> DIRECT FROM FARM <i>✦</i> FARM-FRESH MILK <i>✦</i> BILONA DESI GHEE <i>✦</i> PURE BY NATURE <i>✦</i> LOCAL SOURCING <i>✦</i> RESPONSIBLE CARE <i>✦</i> FARM FRESH <i>✦</i> HONEST BY CHOICE <i>✦</i> BATCH RECORDS <i>✦</i> DIRECT FROM FARM <i>✦</i></div></section>
 
     <section class="story cream-section" id="story">
       <div class="leaf-sketch left-leaf">⌇</div><div class="section-index">01 — OUR ORIGIN</div>
       <div class="story-heading reveal"><p class="eyebrow">THE MURRAH BUFFALO LEGACY</p><h2>Where dairy tradition<br>meets <em>thoughtful care.</em></h2></div>
       <div class="story-grid">
-        <div class="story-visual reveal tilt-card"><div class="photo-frame"><img src="assets/samara-open-parlor.jpg" width="1024" height="1024" loading="lazy" decoding="async" alt="Hygienic machine milking of Murrah buffaloes in a modern open dairy parlor"><div class="float-stamp"><img src="assets/samara-buffalo-logo.webp" alt="Samara Organics Logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div></div></div>
-        <div class="story-copy reveal"><span class="gold-rule"></span><p class="lead">Born in the dairy belt between Bulandshahr and Aligarh, Samara Organics is building a carefully documented <strong>Murrah buffalo</strong> dairy operation rooted in local husbandry and transparent handling.</p><p>Our husbandry standard is being built around clean housing, suitable feed, veterinary oversight and low-stress handling. Final A2, organic and residue claims will appear only where supported by current test or certification records.</p><p>We combine the region's generations-old dairy knowledge with careful testing, hygienic handling and a transparent local supply chain. From our farm to your family — every drop is traceable.</p><div class="signature">Dr. Mohammad Abdullah Raza <small>FARM MANAGER</small></div><a class="text-button" href="#promise">OUR PHILOSOPHY <span>↗</span></a></div>
+        <div class="story-visual reveal tilt-card"><div class="photo-frame"><img src="assets/samara-open-parlor.jpg" loading="lazy" decoding="async" alt="Hygienic machine milking of Murrah buffaloes in a modern open dairy parlor" width="1024" height="1024"><div class="float-stamp"><img src="assets/samara-heritage-logo.jpg" alt="Samara Organics buffalo and leaf wordmark" style="width:100%;height:100%;object-fit:contain;border-radius:14px;background:#fffaf0;padding:8px" width="1254" height="1254"></div></div></div>
+        <div class="story-copy reveal"><span class="gold-rule"></span><p class="lead">Born in the dairy belt between Bulandshahr and Aligarh, Samara Organics is building a carefully documented <strong>Murrah buffalo</strong> dairy operation rooted in local husbandry and transparent handling.</p><p>Our husbandry standard is being built around clean housing, suitable feed, veterinary oversight and low-stress handling. Final A2, organic and residue claims will appear only where supported by current test or certification records.</p><p>We combine the region's generations-old dairy knowledge with careful testing, hygienic handling and a transparent local supply chain. From our farm to your family, our goal is a clear traceable record for every dispatched batch.</p><div class="signature">Dr. Mohammad Abdullah Raza <small>FARM MANAGER</small></div><a class="text-button" href="#promise">OUR PHILOSOPHY <span>↗</span></a></div>
       </div>
       
       <!-- Breed & Bilona Explainer Tabs -->
       <div class="story-explainer reveal">
         <div class="explainer-nav">
-          <button class="explainer-tab active" data-tab="breed">The Murrah Breed</button>
-          <button class="explainer-tab" data-tab="bilona">The Bilona Process</button>
+          <button type="button" class="explainer-tab active" data-tab="breed">The Murrah Breed</button>
+          <button type="button" class="explainer-tab" data-tab="bilona">The Bilona Process</button>
         </div>
         
         <div class="explainer-content active" id="tab-breed">
@@ -81,7 +94,7 @@
             <div class="bilona-steps">
               <div class="bilona-step-card">
                 <span class="step-badge">01</span>
-                <h4>Organic Milking</h4>
+                <h4>Hygienic Milking</h4>
                 <p>Milk is collected under a documented hygiene routine from the Samara Murrah herd.</p>
               </div>
               <div class="bilona-step-card">
@@ -113,10 +126,23 @@
     <section class="products" id="products">
       <div class="product-head reveal"><div><p class="eyebrow light">THE SAMARA COLLECTION</p><h2>Everyday goodness,<br><em>elevated.</em></h2></div><p>Essential dairy, crafted in small batches and designed to arrive at your door with its natural character intact.</p></div>
       <div class="product-stage">
-        <article class="product reveal" data-product="Organic A2 Milk"><div class="product-number">01</div><span class="badge">SIGNATURE</span><div class="product-object"><img src="assets/samara-milk-bottle.webp" alt="Samara farm-fresh milk bottle" loading="lazy" decoding="async" style="height:370px;object-fit:contain;z-index:2;position:relative"><div class="shadow"></div></div><div class="product-meta"><p>MORNING ESSENTIAL</p><h3>Farm Fresh Milk</h3><div class="product-buy-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>1 L</span><div style="display:flex;gap:15px"><button type="button" class="product-action" style="float:none;padding:5px 0">ADD TO CART <b>+</b></button><button type="button" class="product-buy-now" style="background:transparent;border:0;border-bottom:1px solid rgba(230,212,155,0.55);color:var(--palegold);font-size:10px;letter-spacing:0.12em;padding:5px 0;font-family:inherit;font-weight:700;cursor:pointer">BUY NOW <b>&rarr;</b></button></div></div></div></article>
-        <article class="product featured reveal" data-product="Bilona Desi Ghee"><div class="product-number">02</div><span class="badge">SIGNATURE</span><div class="product-object"><img src="assets/samara-ghee-jar.webp" alt="Samara Bilona Desi Ghee Jar" loading="lazy" decoding="async" style="height:230px;object-fit:contain;z-index:2;position:relative;margin-bottom:30px"><div class="shadow"></div></div><div class="product-meta"><p>HERITAGE CRAFT</p><h3>Bilona Desi Ghee</h3><div class="product-buy-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>500 ML</span><div style="display:flex;gap:15px"><button type="button" class="product-action" style="float:none;padding:5px 0">ADD TO CART <b>+</b></button><button type="button" class="product-buy-now" style="background:transparent;border:0;border-bottom:1px solid rgba(230,212,155,0.55);color:var(--palegold);font-size:10px;letter-spacing:0.12em;padding:5px 0;font-family:inherit;font-weight:700;cursor:pointer">BUY NOW <b>&rarr;</b></button></div></div></div></article>
-        <article class="product reveal" data-product="Traditional Dahi"><div class="product-number">03</div><div class="product-object"><img src="assets/samara-dahi-bowl.webp" alt="Samara Traditional Dahi Bowl" loading="lazy" decoding="async" style="height:190px;object-fit:contain;z-index:2;position:relative;margin-bottom:40px"><div class="shadow"></div></div><div class="product-meta"><p>SLOW-SET CULTURE</p><h3>Traditional Dahi</h3><div class="product-buy-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>500 ML</span><div style="display:flex;gap:15px"><button type="button" class="product-action" style="float:none;padding:5px 0">ADD TO CART <b>+</b></button><button type="button" class="product-buy-now" style="background:transparent;border:0;border-bottom:1px solid rgba(230,212,155,0.55);color:var(--palegold);font-size:10px;letter-spacing:0.12em;padding:5px 0;font-family:inherit;font-weight:700;cursor:pointer">BUY NOW <b>&rarr;</b></button></div></div></div></article>
-      </div><div class="coming reveal" style="max-width:620px;margin-inline:auto">Launching with milk, dahi and ghee. Paneer, chaach and white butter will follow. <a href="#contact">Join the first tasting →</a></div>
+        <article class="product reveal" data-product="Organic A2 Milk"><div class="product-number">01</div><span class="badge">SIGNATURE</span><a class="product-object" href="products.html#milk" aria-label="View full details for Farm Fresh Milk"><img src="assets/samara-heritage-milk.jpg" alt="Samara farm-fresh milk concept packaging" loading="lazy" decoding="async" width="1254" height="1254"><div class="shadow"></div></a><div class="product-meta"><p>MORNING ESSENTIAL</p><h3><a href="products.html#milk">Farm Fresh Milk</a></h3><div class="product-buy-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>1 L</span><div style="display:flex;gap:15px"><button type="button" class="product-action" style="float:none;padding:5px 0">ADD TO CART <b>+</b></button><button type="button" class="product-buy-now" style="background:transparent;border:0;border-bottom:1px solid rgba(230,212,155,0.55);color:var(--palegold);font-size:10px;letter-spacing:0.12em;padding:5px 0;font-family:inherit;font-weight:700;cursor:pointer">BUY NOW <b>&rarr;</b></button></div></div></div></article>
+        <article class="product featured reveal" data-product="Bilona Desi Ghee"><div class="product-number">02</div><span class="badge">SIGNATURE</span><a class="product-object" href="products.html#ghee" aria-label="View full details for Bilona Desi Ghee"><img src="assets/samara-heritage-ghee.jpg" alt="Samara Bilona Desi Ghee concept packaging" loading="lazy" decoding="async" width="1254" height="1254"><div class="shadow"></div></a><div class="product-meta"><p>HERITAGE CRAFT</p><h3><a href="products.html#ghee">Bilona Desi Ghee</a></h3><div class="product-buy-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>500 ML</span><div style="display:flex;gap:15px"><button type="button" class="product-action" style="float:none;padding:5px 0">ADD TO CART <b>+</b></button><button type="button" class="product-buy-now" style="background:transparent;border:0;border-bottom:1px solid rgba(230,212,155,0.55);color:var(--palegold);font-size:10px;letter-spacing:0.12em;padding:5px 0;font-family:inherit;font-weight:700;cursor:pointer">BUY NOW <b>&rarr;</b></button></div></div></div></article>
+        <article class="product reveal" data-product="Traditional Dahi"><div class="product-number">03</div><a class="product-object" href="products.html#dahi" aria-label="View full details for Traditional Dahi"><img src="assets/samara-heritage-dahi.jpg" alt="Samara Traditional Dahi concept packaging" loading="lazy" decoding="async" width="1254" height="1254"><div class="shadow"></div></a><div class="product-meta"><p>SLOW-SET CULTURE</p><h3><a href="products.html#dahi">Traditional Dahi</a></h3><div class="product-buy-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>500 G</span><div style="display:flex;gap:15px"><button type="button" class="product-action" style="float:none;padding:5px 0">ADD TO CART <b>+</b></button><button type="button" class="product-buy-now" style="background:transparent;border:0;border-bottom:1px solid rgba(230,212,155,0.55);color:var(--palegold);font-size:10px;letter-spacing:0.12em;padding:5px 0;font-family:inherit;font-weight:700;cursor:pointer">BUY NOW <b>&rarr;</b></button></div></div></div></article>
+      </div>
+      <aside class="launch-offer reveal" aria-labelledby="launch-offer-title">
+        <div class="launch-offer-copy">
+          <span class="launch-offer-kicker">FOUNDING SUBSCRIBER OFFER</span>
+          <h3 id="launch-offer-title"><strong>First 14</strong> subscribers receive our<br><em>Luxury Farm Tour—free.</em></h3>
+          <p>The first 14 confirmed Samara subscribers will receive a complimentary guided luxury farm experience.</p>
+        </div>
+        <div class="launch-offer-action">
+          <span aria-hidden="true">14</span>
+          <p>Milk, dahi and ghee launch first.<br>Paneer, chaach and white butter will follow.</p>
+          <a href="index.html?open=subscribe">Become a subscriber <b aria-hidden="true">→</b></a>
+        </div>
+      </aside>
+      <p class="concept-packaging-note reveal">Packaging artwork shown is a pre-launch concept. A2 and organic wording will appear on sale packs only where supported by applicable verification and certification.</p>
     </section>
 
 
@@ -173,23 +199,24 @@
             <h3>Batch Traceability Portal</h3>
             <p>Enter a Samara batch code to view the source, handling and quality information currently recorded for that batch.</p>
           </div>
-          <div class="batch-checker-form">
-            <input type="text" id="batch-code-input" placeholder="Enter Batch Code (e.g. SAM-0712)" maxlength="12" autocomplete="off">
-            <button type="button" id="batch-verify-btn">Verify Purity <span>→</span></button>
-          </div>
+          <form class="batch-checker-form" id="batch-checker-form">
+            <label class="sr-only" for="batch-code-input">Batch code</label>
+            <input type="text" id="batch-code-input" placeholder="Enter Batch Code (e.g. SAM-0712)" minlength="5" maxlength="32" pattern="[A-Za-z0-9-]{5,32}" autocomplete="off" spellcheck="false" required>
+            <button type="submit" id="batch-verify-btn">View Batch Record <span>→</span></button>
+          </form>
           <div id="batch-verify-result" class="batch-verify-result" aria-live="polite"></div>
         </div>
       </div>
     </section>
 
-    <section class="why-samara cream-section" aria-labelledby="why-title"><div class="section-index">04 — WHY SAMARA</div><div class="why-head"><p class="eyebrow">CLEAR DIFFERENCES</p><h2 id="why-title">Know what reaches<br><em>your table.</em></h2></div><div class="why-table" role="table" aria-label="Why Samara comparison"><div role="row"><b role="columnheader">STANDARD</b><b role="columnheader">SAMARA APPROACH</b></div><div role="row"><span role="cell">Sourcing</span><p role="cell">Direct, identified farm batches rather than anonymous pooled supply.</p></div><div role="row"><span role="cell">Testing</span><p role="cell">Batch records for core quality and safety checks before dispatch.</p></div><div role="row"><span role="cell">Delivery time</span><p role="cell">Short local routes planned around Aligarh, Bulandshahr and Khurja.</p></div><div role="row"><span role="cell">Animal care</span><p role="cell">Clean housing, suitable feed, veterinary oversight and low-stress handling.</p></div></div><div class="dairy-terms"><article><h3>A2</h3><p>Milk identified by its beta-casein protein type. It is not a medical treatment and does not make milk safe for anyone with a milk allergy.</p></article><article><h3>Bilona</h3><p>A traditional process in which cultured curd is churned to butter and the butter is slowly clarified into ghee.</p></article><article><h3>Organic</h3><p>A regulated production claim that should only appear on sale packaging once the relevant certification and records are in place.</p></article><article><h3>Batch tested</h3><p>A defined production lot linked to recorded checks. The exact tests, method, laboratory and result should be shown on its batch page.</p></article></div></section>
+    <section class="why-samara cream-section" aria-labelledby="why-title"><div class="section-index">04 — WHY SAMARA</div><div class="why-head"><p class="eyebrow">CLEAR DIFFERENCES</p><h2 id="why-title">Know what reaches<br><em>your table.</em></h2></div><div class="why-table" role="table" aria-label="Why Samara comparison"><div role="row"><b role="columnheader">STANDARD</b><b role="columnheader">SAMARA APPROACH</b></div><div role="row"><span role="cell">Sourcing</span><p role="cell">Direct, identified farm batches rather than anonymous pooled supply.</p></div><div role="row"><span role="cell">Testing</span><p role="cell">Planned batch records for defined quality and safety checks before dispatch.</p></div><div role="row"><span role="cell">Delivery time</span><p role="cell">Short local routes planned around Aligarh, Bulandshahr and Khurja.</p></div><div role="row"><span role="cell">Animal care</span><p role="cell">Clean housing, suitable feed, veterinary oversight and low-stress handling.</p></div></div><div class="dairy-terms"><article><h3>A2</h3><p>Milk identified by its beta-casein protein type. It is not a medical treatment and does not make milk safe for anyone with a milk allergy.</p></article><article><h3>Bilona</h3><p>A traditional process in which cultured curd is churned to butter and the butter is slowly clarified into ghee.</p></article><article><h3>Organic</h3><p>A regulated production claim that should only appear on sale packaging once the relevant certification and records are in place.</p></article><article><h3>Batch tested</h3><p>A defined production lot linked to recorded checks. The exact tests, method, laboratory and result should be shown on its batch page.</p></article></div></section>
 
     <section class="faq cream-section"><div class="faq-intro reveal"><p class="eyebrow">QUESTIONS, ANSWERED</p><h2>Before your<br><em>first pour.</em></h2><a href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20have%20a%20question" target="_blank" rel="noopener">ASK US ON WHATSAPP <span>↗</span></a></div><div class="accordions"><details class="reveal"><summary>Where will you deliver first?<span>+</span></summary><p>Our first routes are being planned around Aligarh, Bulandshahr, Khurja and nearby communities.</p></details><details class="reveal"><summary>How will Samara prove quality?<span>+</span></summary><p>We are designing batch-level quality information covering source, collection timing, core checks and handling. Final report formats will be shared before commercial launch.</p></details><details class="reveal"><summary>Which products are launching?<span>+</span></summary><p>Farm fresh milk, naturally set dahi and bilona desi ghee come first. Paneer, chaach and white butter will follow as routes stabilize.</p></details><details class="reveal"><summary>Can I reserve a subscription now?<span>+</span></summary><p>You can join the first-delivery list or create a WhatsApp enquiry. We will contact you with pricing and subscription options once your route opens.</p></details></div></section>
 
-    <section class="contact" id="contact"><div class="contact-bg"></div><div class="contact-copy reveal"><p class="eyebrow light">THE FIRST POUR</p><h2>Let’s build a healthier<br>tomorrow, <em>together.</em></h2><p>Join our first delivery circle around Aligarh, Bulandshahr and nearby communities.</p><form id="waitlist"><div class="field"><span>+91</span><input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" aria-label="Your mobile number" placeholder="Your mobile number" required><button>JOIN THE LIST <b>→</b></button></div><small>Launch news and your first-order invitation. Nothing else.</small></form><div class="success">Welcome to Samara. We’ll be in touch soon.</div></div></section>
+    <section class="contact" id="contact"><div class="contact-bg"></div><div class="contact-copy reveal"><p class="eyebrow light">THE FIRST POUR</p><h2>Let’s build a healthier<br>tomorrow, <em>together.</em></h2><p>Join our first delivery circle around Aligarh, Bulandshahr and nearby communities.</p><form id="waitlist"><div class="field"><span>+91</span><input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" pattern="[6-9][0-9]{9}" aria-label="Your mobile number" placeholder="Your mobile number" required><button type="submit">JOIN THE LIST <b>→</b></button></div><small>Launch news and your first-order invitation. Nothing else.</small></form><div class="success">Welcome to Samara. We’ll be in touch soon.</div></div></section>
   </main>
 
-  <footer><div class="footer-brand"><a class="logo" href="#home"><img src="assets/samara-buffalo-logo.webp" alt="Samara Organics" class="logo-img"><div class="logo-text"><b>SAMARA</b><span>ORGANICS</span></div></a><p>Pure by nature, honest by choice.</p></div><div class="footer-col"><b>CONTACT &amp; SUPPORT</b><a href="tel:+918077366897">+91 80773 66897</a><a href="mailto:samaraorganics.india@gmail.com">samaraorganics.india@gmail.com</a><a href="track.html">Track an order</a><a href="manage-subscription.html">Manage a subscription</a><a href="support.html">Customer care</a><a href="https://instagram.com/samaraorganics.india">@samaraorganics.india</a></div><div class="footer-col"><b>OFFICE</b><p>Kothi Lalarukh, Above Union Bank of India,<br>Civil Lines, Medical Road, Aligarh</p></div><div class="footer-bottom"><span>© 2026 SAMARA ORGANICS</span><span>CRAFTED IN WESTERN UTTAR PRADESH</span><span><a href="privacy.html">PRIVACY</a> · <a href="terms.html">TERMS</a> · <a href="shipping-refunds.html">DELIVERY &amp; REFUNDS</a></span></div></footer>
+  <footer><div class="footer-brand"><a class="logo" href="#home"><img src="assets/samara-heritage-logo.jpg" alt="Samara Organics buffalo and leaf wordmark" class="logo-img" width="1254" height="1254"><div class="logo-text"><b>SAMARA</b><span>ORGANICS</span></div></a><p>Pure by nature, honest by choice.</p></div><div class="footer-col"><b>CONTACT &amp; SUPPORT</b><a href="tel:+918077366897">+91 80773 66897</a><a href="mailto:samaraorganics.india@gmail.com">samaraorganics.india@gmail.com</a><a href="track.html">Track an order</a><a href="manage-subscription.html">Manage a subscription</a><a href="support.html">Customer care</a><a href="https://instagram.com/samaraorganics.india">@samaraorganics.india</a></div><div class="footer-col"><b>OFFICE</b><p>Kothi Lalarukh, Above Union Bank of India,<br>Civil Lines, Medical Road, Aligarh</p></div><div class="footer-bottom"><span>© 2026 SAMARA ORGANICS</span><span>CRAFTED IN WESTERN UTTAR PRADESH</span><span><a href="privacy.html">PRIVACY</a> · <a href="terms.html">TERMS</a> · <a href="shipping-refunds.html">DELIVERY &amp; REFUNDS</a></span></div></footer>
   <a href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20have%20a%20question" target="_blank" rel="noopener" class="whatsapp-fab" aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
   <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
   <button type="button" class="enquiry-fab" aria-label="Open cart"><span>0</span><i>CART</i></button><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true" inert><div class="drawer-head"><div><small>YOUR ORDER</small><h2 id="drawer-title">Shopping Cart</h2></div><button type="button" class="cart-clear-btn" style="background:transparent;border:0;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.08em;cursor:pointer;margin-left:auto;margin-right:15px;display:none">CLEAR ALL</button><button type="button" class="drawer-close" aria-label="Close cart">×</button></div>
@@ -199,7 +226,7 @@
     <div class="drawer-empty">
       <span>◇</span>
       <p>Your cart is empty.</p>
-      <small>Browse our range of pure A2 dairy products and add them here.</small>
+      <small>Browse our farm-crafted dairy range and add products here.</small>
     </div>
     <div class="drawer-foot">
       <div class="cart-summary">
@@ -221,7 +248,7 @@
         <label for="checkout-phone">MOBILE NUMBER</label>
         <div class="phone-input-wrapper">
           <span>+91</span>
-          <input type="tel" id="checkout-phone" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required>
+          <input type="tel" id="checkout-phone" placeholder="9876543210" inputmode="numeric" autocomplete="tel" pattern="[6-9][0-9]{9}" maxlength="10" required>
         </div>
       </div>
       <div class="form-field">
@@ -253,10 +280,11 @@
           </label>
         </div>
       </div>
-      <label for="checkout-terms" style="display:flex;align-items:flex-start;gap:9px;font-size:9px;line-height:1.55;color:var(--muted);margin:4px 0 10px;cursor:pointer"><input id="checkout-terms" type="checkbox" required style="margin-top:2px;accent-color:var(--forest)"><span>I agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:var(--olive);text-decoration:underline">Terms</a>, <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--olive);text-decoration:underline">Privacy Policy</a> and <a href="shipping-refunds.html" target="_blank" rel="noopener" style="color:var(--olive);text-decoration:underline">Delivery &amp; Refunds Policy</a>.</span></label>
+      <label for="checkout-terms" style="display:flex;align-items:flex-start;gap:9px;font-size:11px;line-height:1.55;color:var(--muted);margin:4px 0 10px;cursor:pointer"><input id="checkout-terms" type="checkbox" required style="margin-top:2px;accent-color:var(--forest)"><span>I agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:var(--olive);text-decoration:underline">Terms</a>, <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--olive);text-decoration:underline">Privacy Policy</a> and <a href="shipping-refunds.html" target="_blank" rel="noopener" style="color:var(--olive);text-decoration:underline">Delivery &amp; Refunds Policy</a>.</span></label>
+      <div id="checkout-feedback" class="checkout-feedback" role="alert" aria-live="assertive" aria-atomic="true" tabindex="-1"></div>
       <div class="checkout-actions" style="margin-top:auto;padding-top:20px;display:flex;flex-direction:column;gap:10px">
-        <button class="checkout-direct-btn" type="button">DIRECT WEBSITE ORDER <span>✓</span></button>
-        <button class="checkout-submit-btn" type="submit">PLACE ORDER VIA WHATSAPP <span>→</span></button>
+        <button class="checkout-direct-btn" type="button">PLACE WEBSITE ORDER <span>✓</span></button>
+        <button class="checkout-submit-btn" type="submit">PLACE &amp; CONFIRM ON WHATSAPP <span>→</span></button>
         <button class="checkout-back-btn" type="button" style="margin-top:6px">← BACK TO CART</button>
       </div>
     </form>
@@ -267,13 +295,13 @@
   <div class="page-modal" id="subscribe-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Daily Subscription" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container sub-modal-container">
-      <button class="modal-close" id="subscribe-modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" id="subscribe-modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll-content">
         <div id="sub-form-container">
           <div class="modal-head">
             <small>SAMARA PLANNER</small>
             <h2>Customize Your Subscription</h2>
-            <p>Book fresh dairy deliveries for the next 30 days. Customize specific dates using the interactive calendar.</p>
+            <p>Plan up to 60 days of fresh dairy deliveries. Customize individual dates using the interactive calendar.</p>
           </div>
           
           <form id="subscribe-modal-form">
@@ -281,8 +309,8 @@
               <div class="form-field">
                 <label for="sub-product">SELECT PRODUCT</label>
                 <select id="sub-product" required>
-                  <option value="Organic A2 Milk">Organic A2 Milk (₹110 / 1 L)</option>
-                  <option value="Traditional Dahi">Traditional Dahi (₹89 / 500 ML)</option>
+                  <option value="Organic A2 Milk">Farm Fresh Milk (₹110 / 1 L)</option>
+                  <option value="Traditional Dahi">Traditional Dahi (₹89 / 500 G)</option>
                   <option value="Bilona Desi Ghee">Bilona Desi Ghee (₹749 / 500 ML)</option>
                 </select>
               </div>
@@ -314,14 +342,14 @@
             <!-- Interactive Calendar Section -->
             <div class="calendar-wrapper">
               <div class="calendar-header">
-                <button type="button" class="cal-nav-btn prev-month" disabled>&larr;</button>
-                <h4 class="calendar-month-year">Month Year</h4>
-                <button type="button" class="cal-nav-btn next-month">&rarr;</button>
+                <button type="button" class="cal-nav-btn prev-month" aria-label="Show previous month" disabled>&larr;</button>
+                <h4 class="calendar-month-year" aria-live="polite">Month Year</h4>
+                <button type="button" class="cal-nav-btn next-month" aria-label="Show next month">&rarr;</button>
               </div>
               <div class="calendar-weekdays">
                 <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
               </div>
-              <div class="calendar-grid" id="sub-calendar-grid">
+              <div class="calendar-grid" id="sub-calendar-grid" role="group" aria-label="Choose delivery dates">
                 <!-- Dynamically rendered day cells -->
               </div>
               <div class="calendar-info">
@@ -329,8 +357,7 @@
                   <button type="button" class="duration-btn active" id="btn-select-30">30 Days Plan</button>
                   <button type="button" class="duration-btn" id="btn-select-60">60 Days Plan</button>
                 </div>
-                <p>Total Deliveries selected: <strong id="sub-days-count">0</strong> days</p>
-                <p>Estimated Cost: <strong id="sub-total-cost">₹0</strong></p>
+                <div class="calendar-selection-summary" aria-live="polite" aria-atomic="true"><p>Total Deliveries selected: <strong id="sub-days-count">0</strong> days</p><p>Estimated Cost: <strong id="sub-total-cost">₹0</strong></p></div>
                 <span class="pricing-hint">(Standard pricing applies. Zero delivery charges)</span>
               </div>
             </div>
@@ -343,7 +370,7 @@
               <label for="sub-phone">MOBILE NUMBER</label>
               <div class="phone-input-wrapper">
                 <span>+91</span>
-                <input type="tel" id="sub-phone" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required>
+                <input type="tel" id="sub-phone" placeholder="9876543210" inputmode="numeric" autocomplete="tel" pattern="[6-9][0-9]{9}" maxlength="10" required>
               </div>
             </div>
             <div class="form-grid-2">
@@ -357,9 +384,10 @@
               </div>
             </div>
   
+            <div id="sub-feedback" class="checkout-feedback" role="alert" aria-live="assertive" aria-atomic="true" tabindex="-1"></div>
             <div class="checkout-actions" style="margin-top:20px; display:flex; flex-direction:column; gap:10px">
-              <button class="checkout-direct-btn" id="sub-direct-btn" type="button">CONFIRM SUBSCRIPTION DIRECTLY <span>✓</span></button>
-              <button class="checkout-submit-btn" id="sub-whatsapp-btn" type="submit">SUBSCRIBE VIA WHATSAPP <span>→</span></button>
+              <button class="checkout-direct-btn" id="sub-direct-btn" type="button">START SUBSCRIPTION <span>✓</span></button>
+              <button class="checkout-submit-btn" id="sub-whatsapp-btn" type="submit">START &amp; CONFIRM ON WHATSAPP <span>→</span></button>
             </div>
           </form>
         </div>
@@ -379,18 +407,19 @@
   <div class="page-modal" id="tour-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Book Farm Tour" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container" style="max-width:550px">
-      <button class="modal-close" id="tour-modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" id="tour-modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll-content">
         <div class="modal-head">
           <small>PRIVATE INVITATION</small>
           <h2>Book a Farm Tour</h2>
-          <p>Experience our state-of-the-art DeLaval parlor, meet our Murrah buffalo herd, and enjoy fresh dairy tasting.</p>
+          <p>Request a guided visit to experience the Samara dairy vision, learn about Murrah buffalo care and enjoy a fresh dairy tasting.</p>
         </div>
 
         <div style="background:rgba(198,162,81,0.08); border:1px solid var(--gold); padding:16px; border-radius:8px; text-align:center; margin-bottom:25px">
           <span style="font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); font-weight:700; display:block; margin-bottom:4px">Booking Cost (₹99/Person)</span>
           <strong style="font:600 28px 'Cormorant Garamond'; color:var(--forest)" id="tour-total-cost">₹99</strong>
         </div>
+        <p class="farm-tour-offer"><b>FOUNDING SUBSCRIBER OFFER</b>The tour fee is waived for the first 14 confirmed Samara subscribers. Eligibility is confirmed by our team.</p>
 
         <form id="tour-modal-form">
           <div class="form-grid-2">
@@ -402,7 +431,7 @@
               <label for="tour-phone">MOBILE NUMBER</label>
               <div class="phone-input-wrapper" style="display:flex;align-items:center;border:1px solid var(--line);background:var(--ivory);height:50px">
                 <span style="padding:0 12px;font-size:12px;font-weight:700;color:var(--muted);border-right:1px solid var(--line)">+91</span>
-                <input type="tel" id="tour-phone" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required style="border:0;outline:0;background:transparent;padding:0 12px;flex:1">
+                <input type="tel" id="tour-phone" placeholder="9876543210" inputmode="numeric" autocomplete="tel" pattern="[6-9][0-9]{9}" maxlength="10" required style="border:0;outline:0;background:transparent;padding:0 12px;flex:1;min-width:0">
               </div>
             </div>
           </div>
@@ -437,6 +466,8 @@
             </select>
           </div>
 
+          <div id="tour-feedback" class="checkout-feedback" role="status" aria-live="polite" tabindex="-1"></div>
+
           <div class="checkout-actions" style="margin-top:25px; display:flex; flex-direction:column; gap:10px">
             <button class="checkout-submit-btn" type="submit" style="justify-content:center">BOOK VIA WHATSAPP <span>→</span></button>
           </div>
@@ -445,13 +476,13 @@
     </div>
   </div>
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"LocalBusiness","@id":"https://samaraorganics.in/#business","name":"Samara Organics","url":"https://samaraorganics.in/","image":"https://samaraorganics.in/assets/samara-hero-3d-wide.webp","logo":"https://samaraorganics.in/assets/samara-buffalo-logo.webp","description":"Farm-fresh traceable dairy serving Aligarh, Bulandshahr and nearby communities.","telephone":"+91-8077366897","email":"samaraorganics.india@gmail.com","address":{"@type":"PostalAddress","streetAddress":"Kothi Lalarukh, Above Union Bank of India, Civil Lines, Medical Road","addressLocality":"Aligarh","addressRegion":"Uttar Pradesh","addressCountry":"IN"},"areaServed":["Aligarh","Bulandshahr","Khurja"],"sameAs":["https://instagram.com/samaraorganics.india"]},{"@type":"Product","name":"Farm Fresh Milk","brand":{"@type":"Brand","name":"Samara Organics"},"category":"Dairy","image":"https://samaraorganics.in/assets/samara-milk-bottle.webp","offers":{"@type":"Offer","price":"110","priceCurrency":"INR","availability":"https://schema.org/PreOrder","url":"https://samaraorganics.in/products.html#milk"}},{"@type":"Product","name":"Bilona Desi Ghee","brand":{"@type":"Brand","name":"Samara Organics"},"category":"Dairy","image":"https://samaraorganics.in/assets/samara-ghee-jar.webp","offers":{"@type":"Offer","price":"749","priceCurrency":"INR","availability":"https://schema.org/PreOrder","url":"https://samaraorganics.in/products.html#ghee"}},{"@type":"Product","name":"Naturally Set Dahi","brand":{"@type":"Brand","name":"Samara Organics"},"category":"Dairy","image":"https://samaraorganics.in/assets/samara-dahi-bowl.webp","offers":{"@type":"Offer","price":"89","priceCurrency":"INR","availability":"https://schema.org/PreOrder","url":"https://samaraorganics.in/products.html#dahi"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Where will you deliver first?","acceptedAnswer":{"@type":"Answer","text":"Initial routes are planned around Aligarh, Bulandshahr, Khurja and nearby communities."}},{"@type":"Question","name":"How will Samara prove quality?","acceptedAnswer":{"@type":"Answer","text":"Samara is designing batch-level quality information covering source, collection timing, core checks and handling."}},{"@type":"Question","name":"Which products are launching?","acceptedAnswer":{"@type":"Answer","text":"Farm fresh milk, naturally set dahi and bilona desi ghee are planned first."}},{"@type":"Question","name":"Can I reserve a subscription now?","acceptedAnswer":{"@type":"Answer","text":"Customers can join the first-delivery list and will be contacted when their route opens."}}]}]}</script>
+  <script type="application/ld+json" id="site-structured-data">{"@context":"https://schema.org","@graph":[{"@type":"LocalBusiness","@id":"https://samaraorganics.in/#business","name":"Samara Organics","url":"https://samaraorganics.in/","image":"https://samaraorganics.in/assets/samara-heritage-hero.jpg","logo":"https://samaraorganics.in/assets/samara-heritage-logo.jpg","description":"Farm-fresh, locally handled dairy with transparent batch records serving Aligarh, Bulandshahr and nearby communities.","telephone":"+91-8077366897","email":"samaraorganics.india@gmail.com","address":{"@type":"PostalAddress","streetAddress":"Kothi Lalarukh, Above Union Bank of India, Civil Lines, Medical Road","addressLocality":"Aligarh","addressRegion":"Uttar Pradesh","addressCountry":"IN"},"areaServed":["Aligarh","Bulandshahr","Khurja"],"sameAs":["https://instagram.com/samaraorganics.india"]},{"@type":"Product","name":"Farm Fresh Milk","brand":{"@type":"Brand","name":"Samara Organics"},"category":"Dairy","image":"https://samaraorganics.in/assets/samara-heritage-milk.jpg","offers":{"@type":"Offer","price":110,"priceCurrency":"INR","availability":"https://schema.org/InStock","url":"https://samaraorganics.in/products.html#milk"}},{"@type":"Product","name":"Bilona Desi Ghee","brand":{"@type":"Brand","name":"Samara Organics"},"category":"Dairy","image":"https://samaraorganics.in/assets/samara-heritage-ghee.jpg","offers":{"@type":"Offer","price":749,"priceCurrency":"INR","availability":"https://schema.org/InStock","url":"https://samaraorganics.in/products.html#ghee"}},{"@type":"Product","name":"Traditional Dahi","brand":{"@type":"Brand","name":"Samara Organics"},"category":"Dairy","image":"https://samaraorganics.in/assets/samara-heritage-dahi.jpg","offers":{"@type":"Offer","price":89,"priceCurrency":"INR","availability":"https://schema.org/InStock","url":"https://samaraorganics.in/products.html#dahi"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Where will you deliver first?","acceptedAnswer":{"@type":"Answer","text":"Initial routes are planned around Aligarh, Bulandshahr, Khurja and nearby communities."}},{"@type":"Question","name":"How will Samara prove quality?","acceptedAnswer":{"@type":"Answer","text":"Samara is designing batch-level quality information covering source, collection timing, core checks and handling."}},{"@type":"Question","name":"Which products are launching?","acceptedAnswer":{"@type":"Answer","text":"Farm fresh milk, naturally set dahi and bilona desi ghee are planned first."}},{"@type":"Question","name":"Can I reserve a subscription now?","acceptedAnswer":{"@type":"Answer","text":"Customers can join the first-delivery list and will be contacted when their route opens."}}]}]}</script>
 
   <!-- Story Modal -->
   <div class="page-modal" id="story-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Our Story" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container">
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll">
         <div class="modal-hero" style="background:linear-gradient(rgba(4,29,20,.85),rgba(4,29,20,.7)),url('assets/samara-delaval-milking.webp') center/cover">
           <p class="eyebrow light">OUR ROOTS</p>
@@ -489,7 +520,7 @@
   <div class="page-modal" id="products-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Our Products" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container">
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll">
         <div class="modal-hero" style="background:radial-gradient(circle at 75% 48%,#1a563d,var(--forest) 58%)">
           <p class="eyebrow light">THE SAMARA COLLECTION</p>
@@ -497,16 +528,16 @@
           <p>Three essentials begin our story. Each one is made with a shorter journey, clearer standards and more respect for the ingredient itself.</p>
         </div>
         <div class="modal-product">
-          <div class="modal-product-visual"><span class="modal-product-num">01</span><img src="assets/samara-milk-bottle.webp" alt="Samara farm-fresh milk bottle" style="height:370px;object-fit:contain;z-index:2;position:relative"></div>
-          <div class="modal-product-info"><p class="eyebrow">MORNING ESSENTIAL</p><h3>Organic A2<br><em>Milk.</em></h3><p>Pure A2 milk from our Murrah buffaloes — fresh, rapidly chilled and delivered locally.</p><div class="modal-facts"><div><b>AVAILABLE IN</b><span>1 L</span></div><div><b>DELIVERY</b><span>DAILY ROUTES</span></div><div><b>HANDLING</b><span>RAPIDLY CHILLED</span></div></div><a class="detail-cta" href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20am%20interested%20in%20Organic%20A2%20Milk" target="_blank" rel="noopener">ENQUIRE ABOUT MILK <span>→</span></a></div>
+          <div class="modal-product-visual"><span class="modal-product-num">01</span><img src="assets/samara-heritage-milk.jpg" alt="Samara farm-fresh milk concept packaging" width="1254" height="1254"></div>
+          <div class="modal-product-info"><p class="eyebrow">MORNING ESSENTIAL</p><h3>Farm Fresh<br><em>Milk.</em></h3><p>Fresh milk from our Murrah buffaloes — hygienically collected, rapidly chilled and delivered locally. A2 identification will be stated only against verified records.</p><div class="modal-facts"><div><b>AVAILABLE IN</b><span>1 L</span></div><div><b>DELIVERY</b><span>DAILY ROUTES</span></div><div><b>HANDLING</b><span>RAPIDLY CHILLED</span></div></div><a class="detail-cta" href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20am%20interested%20in%20Farm%20Fresh%20Milk" target="_blank" rel="noopener">ENQUIRE ABOUT MILK <span>→</span></a></div>
         </div>
         <div class="modal-product reverse">
-          <div class="modal-product-visual"><span class="modal-product-num">02</span><img src="assets/samara-ghee-jar.webp" alt="Samara Bilona Desi Ghee Jar" style="height:230px;object-fit:contain;z-index:2;position:relative"></div>
+          <div class="modal-product-visual"><span class="modal-product-num">02</span><img src="assets/samara-heritage-ghee.jpg" alt="Samara Bilona Desi Ghee concept packaging" width="1254" height="1254"></div>
           <div class="modal-product-info"><p class="eyebrow">HERITAGE CRAFT</p><h3>Bilona Desi<br><em>Ghee.</em></h3><p>A small-batch expression of cultured dairy, prepared slowly to preserve the aroma and character families remember.</p><div class="modal-facts"><div><b>AVAILABLE IN</b><span>500 ML</span></div><div><b>METHOD</b><span>CULTURED · BILONA</span></div><div><b>BATCH</b><span>SMALL CRAFT</span></div></div><a class="detail-cta" href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20am%20interested%20in%20Bilona%20Desi%20Ghee" target="_blank" rel="noopener">ENQUIRE ABOUT GHEE <span>→</span></a></div>
         </div>
         <div class="modal-product">
-          <div class="modal-product-visual"><span class="modal-product-num">03</span><img src="assets/samara-dahi-bowl.webp" alt="Samara Traditional Dahi Bowl" style="height:190px;object-fit:contain;z-index:2;position:relative"></div>
-          <div class="modal-product-info"><p class="eyebrow">SLOW-SET CULTURE</p><h3>Traditional<br><em>Dahi.</em></h3><p>Naturally set for a thick, creamy texture and the clean, familiar tang of properly cultured milk.</p><div class="modal-facts"><div><b>AVAILABLE IN</b><span>500 ML</span></div><div><b>METHOD</b><span>NATURALLY SET</span></div><div><b>TEXTURE</b><span>THICK · CREAMY</span></div></div><a class="detail-cta" href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20am%20interested%20in%20Traditional%20Dahi" target="_blank" rel="noopener">ENQUIRE ABOUT DAHI <span>→</span></a></div>
+          <div class="modal-product-visual"><span class="modal-product-num">03</span><img src="assets/samara-heritage-dahi.jpg" alt="Samara Traditional Dahi concept packaging" width="1254" height="1254"></div>
+          <div class="modal-product-info"><p class="eyebrow">SLOW-SET CULTURE</p><h3>Traditional<br><em>Dahi.</em></h3><p>Naturally set for a thick, creamy texture and the clean, familiar tang of properly cultured milk.</p><div class="modal-facts"><div><b>AVAILABLE IN</b><span>500 G</span></div><div><b>METHOD</b><span>NATURALLY SET</span></div><div><b>TEXTURE</b><span>THICK · CREAMY</span></div></div><a class="detail-cta" href="https://wa.me/918077366897?text=Hello%20Samara%20Organics%2C%20I%20am%20interested%20in%20Traditional%20Dahi" target="_blank" rel="noopener">ENQUIRE ABOUT DAHI <span>→</span></a></div>
         </div>
       </div>
     </div>
@@ -515,7 +546,7 @@
   <div class="page-modal" id="promise-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Our Promise" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container">
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll">
         <div class="modal-hero" style="background:radial-gradient(circle at 40% 50%,#1a563d,var(--forest) 60%)">
           <p class="eyebrow light">HONESTY, MADE VISIBLE</p>
@@ -528,7 +559,7 @@
           <h3>Four checkpoints,<br><em>zero shortcuts.</em></h3>
           <div class="modal-steps">
             <div><span>01</span><div><b>Respectful care</b><p>Animal health, clean shelter and thoughtful feeding come first.</p></div></div>
-            <div><span>02</span><div><b>Test every batch</b><p>Routine checks for adulteration, antibiotics and key quality markers.</p></div></div>
+            <div><span>02</span><div><b>Record defined batch checks</b><p>Planned checks and recorded results will be shown only for the identified batch.</p></div></div>
             <div><span>03</span><div><b>Protect freshness</b><p>Clean handling, rapid chilling and a short local cold chain.</p></div></div>
             <div><span>04</span><div><b>Share the proof</b><p>Clear batch information designed to be accessible on every pack.</p></div></div>
           </div>
@@ -549,7 +580,7 @@
   <div class="page-modal" id="delivery-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Delivery Area" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container">
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll">
         <div class="modal-hero" style="background:linear-gradient(135deg,#0d3a29,var(--forest))">
           <p class="eyebrow light">FRESHNESS STAYS LOCAL</p>
@@ -561,17 +592,17 @@
             <label for="modal-pincode" style="font-size:10px;letter-spacing:.14em;font-weight:700">YOUR DELIVERY PIN CODE</label>
             <div style="height:58px;display:flex;margin-top:8px;border:1px solid var(--line);background:var(--ivory)">
               <input id="modal-pincode" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{6}" maxlength="6" placeholder="202001" required style="flex:1;min-width:0;border:0;outline:0;background:transparent;padding:0 18px;font-size:13px;font-family:Manrope">
-              <button style="border:0;background:var(--forest);color:white;padding:0 20px;font-size:10px;letter-spacing:.12em;font-family:Manrope;font-weight:700;cursor:pointer">CHECK AREA <span style="margin-left:16px;color:var(--palegold)">→</span></button>
+              <button type="submit" style="border:0;background:var(--forest);color:white;padding:0 20px;font-size:10px;letter-spacing:.12em;font-family:Manrope;font-weight:700;cursor:pointer">CHECK AREA <span style="margin-left:16px;color:var(--palegold)">→</span></button>
             </div>
           </form>
           <div class="modal-pin-result" aria-live="polite" style="min-height:38px;padding-top:14px;font-size:11px;line-height:1.5;color:var(--olive)"></div>
           <div style="margin-top:24px">
             <p class="eyebrow" style="margin-bottom:14px">CURRENT SERVICE AREAS</p>
             <div style="display:flex;gap:9px;flex-wrap:wrap">
-              <span style="font-size:9px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">ALIGARH</span>
-              <span style="font-size:9px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">BULANDSHAHR</span>
-              <span style="font-size:9px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">KHURJA</span>
-              <span style="font-size:9px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">SIKANDRABAD</span>
+              <span style="font-size:10px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">ALIGARH</span>
+              <span style="font-size:10px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">BULANDSHAHR</span>
+              <span style="font-size:10px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">KHURJA</span>
+              <span style="font-size:10px;letter-spacing:.12em;border:1px solid var(--line);padding:7px 9px">SIKANDRABAD</span>
             </div>
           </div>
           <div style="margin-top:30px;padding-top:30px;border-top:1px solid var(--line)">
@@ -588,7 +619,7 @@
   <div class="page-modal" id="contact-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Contact Us" inert>
     <div class="modal-backdrop"></div>
     <div class="modal-container">
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-scroll">
         <div class="modal-hero" style="background:linear-gradient(rgba(5,37,26,.85),rgba(5,37,26,.9)),url('assets/samara-delaval-milking.webp') center/cover">
           <p class="eyebrow light">THE FIRST POUR</p>
@@ -598,10 +629,10 @@
         <div class="modal-section">
           <h3>Join the<br><em>first list.</em></h3>
           <form id="modal-waitlist" style="margin-top:20px">
-            <div style="height:61px;display:flex;border:1px solid var(--line);background:var(--ivory)">
-              <span style="font-size:13px;display:flex;align-items:center;padding:0 16px;border-right:1px solid var(--line)">+91</span>
-              <input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" aria-label="Your mobile number" placeholder="Your mobile number" required style="flex:1;border:0;outline:0;padding:0 16px;background:transparent;font-family:Manrope">
-              <button style="height:100%;border:0;background:var(--palegold);padding:0 22px;font:700 11px Manrope;letter-spacing:.12em;color:var(--forest);cursor:pointer">JOIN THE LIST <b style="margin-left:12px">→</b></button>
+            <div class="modal-waitlist-field">
+              <span>+91</span>
+              <input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" pattern="[6-9][0-9]{9}" aria-label="Your mobile number" placeholder="Your mobile number" required>
+              <button type="submit">JOIN THE LIST <b>→</b></button>
             </div>
             <small style="display:block;font-size:10px;color:var(--muted);margin-top:12px">Launch news and your first-order invitation. Nothing else.</small>
           </form>
@@ -625,13 +656,13 @@
   </div>
 
   <style>
-    .page-modal{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s}
+    .page-modal{position:fixed;inset:0;width:100%;height:100dvh;z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s;overflow:hidden}
     .page-modal.open{opacity:1;visibility:visible;pointer-events:auto}
     .page-modal .modal-backdrop{position:absolute;inset:0;background:rgba(3,24,17,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-    .modal-container{position:relative;width:min(920px,96vw);max-height:92vh;background:var(--cream);overflow:hidden;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .55s cubic-bezier(.22,1,.36,1);box-shadow:0 -20px 80px rgba(0,0,0,.4)}
+    .modal-container{position:relative;width:min(920px,96vw);height:min(92dvh,920px);max-height:92dvh;min-height:0;display:flex;flex-direction:column;background:var(--cream);overflow:hidden;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .55s cubic-bezier(.22,1,.36,1);box-shadow:0 -20px 80px rgba(0,0,0,.4)}
     .page-modal.open .modal-container{transform:translateY(0)}
     .modal-close{position:absolute;right:20px;top:20px;z-index:10;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(8,45,32,.6);backdrop-filter:blur(8px);color:white;font-size:28px;display:grid;place-items:center;cursor:pointer;transition:transform .3s,background .3s}.modal-close:hover{transform:rotate(90deg);background:rgba(8,45,32,.85)}
-    .modal-scroll{overflow-y:auto;max-height:92vh;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+    .modal-scroll{flex:1 1 auto;min-height:0;height:100%;overflow-x:hidden;overflow-y:auto;max-height:none;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--gold) transparent;scrollbar-gutter:stable;padding-bottom:max(20px,env(safe-area-inset-bottom))}
     .modal-hero{padding:80px 55px 60px;color:white;position:relative;min-height:340px;display:flex;flex-direction:column;justify-content:flex-end}
     .modal-hero h2{font:600 clamp(42px,5vw,68px)/.9 "Cormorant Garamond";letter-spacing:-.04em;margin:12px 0}
     .modal-hero h2 em{color:var(--palegold)}
@@ -660,17 +691,17 @@
     .modal-product-info>p{font-size:13px;line-height:1.75;color:var(--muted);margin:0 0 20px}
     .modal-facts{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:24px}
     .modal-facts div{padding:14px 10px 14px 0;border-right:1px solid var(--line)}.modal-facts div:last-child{border:0}
-    .modal-facts b{display:block;font-size:9px;letter-spacing:.14em;color:var(--gold);margin-bottom:6px}
+    .modal-facts b{display:block;font-size:10px;letter-spacing:.14em;color:var(--gold);margin-bottom:6px}
     .modal-facts span{font-size:11px;letter-spacing:.08em}
     .modal-testimonials{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:25px}
     .modal-testimonials blockquote{margin:0;padding:28px;background:var(--ivory);border:1px solid var(--line)}
     .modal-testimonials blockquote>span{font:600 42px "Cormorant Garamond";color:var(--gold);line-height:.8}
     .modal-testimonials blockquote>p{font:500 17px/1.5 "Cormorant Garamond";margin:10px 0 20px}
     .modal-testimonials b{font-size:10px;letter-spacing:.13em;display:block}
-    .modal-testimonials small{font-size:9px;letter-spacing:.14em;color:var(--gold);display:block;margin-top:4px}
-    @media(max-width:700px){.modal-container{width:100vw;max-height:95vh;border-radius:16px 16px 0 0}.modal-hero{padding:70px 28px 45px}.modal-section{padding:35px 28px}.modal-product{grid-template-columns:1fr}.modal-product.reverse{direction:ltr}.modal-product-visual{height:300px}.modal-product-info{padding:30px 28px}.modal-facts{grid-template-columns:1fr}.modal-facts div{border-right:0;border-bottom:1px solid var(--line);padding:10px 0}.modal-facts div:last-child{border:0}.modal-testimonials{grid-template-columns:1fr}.modal-section[style*="grid-template-columns"]{grid-template-columns:1fr!important}}
+    .modal-testimonials small{font-size:10px;letter-spacing:.14em;color:var(--gold);display:block;margin-top:4px}
+    @media(max-width:700px){.page-modal{align-items:stretch}.modal-container{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}.modal-close{position:fixed;right:14px;top:max(14px,env(safe-area-inset-top))}.modal-hero{padding:82px 24px 45px}.modal-section{padding:35px 24px}.modal-product{grid-template-columns:1fr}.modal-product.reverse{direction:ltr}.modal-product-visual{height:min(56vw,320px)}.modal-product-info{padding:30px 24px}.modal-facts{grid-template-columns:1fr}.modal-facts div{border-right:0;border-bottom:1px solid var(--line);padding:10px 0}.modal-facts div:last-child{border:0}.modal-testimonials{grid-template-columns:1fr}.modal-section[style*="grid-template-columns"]{grid-template-columns:1fr!important}}
   </style>
-  <script src="assets/build/app.43304e4c80.min.js" defer></script>
+  <script src="assets/build/app.86abf751f4.min.js" defer></script>
   <script>
     // Shared accessible modal lifecycle, including lazy-loaded dialogs.
     const modalFocus = (() => {
@@ -786,11 +817,16 @@
 
     // Modal waitlist form
     const modalWaitlist = document.getElementById('modal-waitlist');
+    const modalWaitlistInput = modalWaitlist?.querySelector('input');
+    modalWaitlistInput?.addEventListener('input', event => {
+      event.target.value = event.target.value.replace(/\D/g, '').slice(0, 10);
+      event.target.setCustomValidity('');
+    });
     modalWaitlist?.addEventListener('submit', e => {
       e.preventDefault();
-      const input = modalWaitlist.querySelector('input');
+      const input = modalWaitlistInput;
       const digits = input.value.replace(/\D/g, '');
-      if (digits.length !== 10) { input.setCustomValidity('Please enter a valid 10-digit mobile number.'); input.reportValidity(); return; }
+      if (!/^[6-9]\d{9}$/.test(digits)) { input.setCustomValidity('Please enter a valid 10-digit Indian mobile number.'); input.reportValidity(); return; }
       input.setCustomValidity('');
       modalWaitlist.style.display = 'none';
       const success = document.querySelector('.modal-waitlist-success');

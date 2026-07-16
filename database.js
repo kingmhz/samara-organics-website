@@ -218,17 +218,16 @@ async function initializeDatabase() {
   const idempotencyRetention = Math.min(Math.max(Number(process.env.IDEMPOTENCY_RETENTION_DAYS || 2), 1), 30);
   await run("DELETE FROM idempotency_keys WHERE created_at < datetime('now', ?)", [`-${idempotencyRetention} days`]);
 
-  const today = new Date();
-  const yesterday = new Date(Date.now() - 86400000);
-  await run('INSERT OR IGNORE INTO batches (id, product_name, date, fat, snf, antibiotics, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?)', ['B2026-0712', 'Organic A2 Milk', isoDate(today), 5.8, 9.2, 0, 98]);
-  await run('INSERT OR IGNORE INTO batches (id, product_name, date, fat, snf, antibiotics, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?)', ['B2026-0711', 'Organic A2 Milk', isoDate(yesterday), 5.7, 9.1, 0, 97]);
-  await run('INSERT OR IGNORE INTO batches (id, product_name, date, fat, snf, antibiotics, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?)', ['G2026-0701', 'Bilona Desi Ghee', '2026-07-01', 99.6, 0.2, 0, 99]);
+  // Remove early design-demo certificates. Public batch records must now be
+  // created deliberately in the authenticated admin portal from real results.
+  await run("DELETE FROM batches WHERE id IN ('B2026-0712', 'B2026-0711', 'G2026-0701')");
   await run('INSERT OR IGNORE INTO inventory (product_name, available_qty, low_stock_threshold) VALUES (?, ?, ?)', ['Organic A2 Milk', 500, 50]);
   await run('INSERT OR IGNORE INTO inventory (product_name, available_qty, low_stock_threshold) VALUES (?, ?, ?)', ['Bilona Desi Ghee', 100, 10]);
   await run('INSERT OR IGNORE INTO inventory (product_name, available_qty, low_stock_threshold) VALUES (?, ?, ?)', ['Traditional Dahi', 250, 25]);
   await run('INSERT OR IGNORE INTO catalog_products (product_name, price, unit, sort_order) VALUES (?, ?, ?, ?)', ['Organic A2 Milk', 110, '1 L', 1]);
   await run('INSERT OR IGNORE INTO catalog_products (product_name, price, unit, sort_order) VALUES (?, ?, ?, ?)', ['Bilona Desi Ghee', 749, '500 ML', 2]);
-  await run('INSERT OR IGNORE INTO catalog_products (product_name, price, unit, sort_order) VALUES (?, ?, ?, ?)', ['Traditional Dahi', 89, '500 ML', 3]);
+  await run('INSERT OR IGNORE INTO catalog_products (product_name, price, unit, sort_order) VALUES (?, ?, ?, ?)', ['Traditional Dahi', 89, '500 G', 3]);
+  await run("UPDATE catalog_products SET unit = '500 G' WHERE product_name = 'Traditional Dahi' AND unit = '500 ML'");
   for (const prefix of configuredRoutePrefixes) {
     for (const slot of ['Morning (6:00 AM - 9:00 AM)', 'Evening (6:00 PM - 9:00 PM)']) {
       await run('INSERT OR IGNORE INTO route_capacity (pincode_prefix, delivery_slot, max_orders, max_units) VALUES (?, ?, ?, ?)', [prefix, slot, 80, 200]);

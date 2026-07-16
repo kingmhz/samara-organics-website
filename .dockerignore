@@ -8,6 +8,12 @@ samara.db
 samara.db-*
 backups
 npm-debug.log*
+*.log
+.server-*
+.release-*
+.browser-server*
+.chrome-*
+.test-*
 assets/samara-mark-source.jpg
 assets/samara-mark-source.webp
 assets/samara-hero-3d-wide.jpg

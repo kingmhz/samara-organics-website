@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samara-cache-1f960df787';
+const CACHE_NAME = 'samara-cache-cf88992add';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,22 +8,12 @@ const ASSETS_TO_CACHE = [
   './terms.html',
   './shipping-refunds.html',
   './404.html',
-  './assets/build/styles.1f960df787.min.css',
-  './assets/build/farm-tour.93ac46f8cd.min.js',
-  './assets/build/subscription-booking.b9c30c40c8.min.js',
-  './assets/build/commerce.a8dafebf01.min.js',
-  './assets/build/app.43304e4c80.min.js',
-  './assets/build/page.6b84868602.min.js',
-  './assets/build/tracking.b25d6ba97b.min.js',
-  './assets/build/support.7e78d7fc41.min.js',
+  './assets/build/styles.406d414b24.min.css',
+  './assets/build/app.86abf751f4.min.js',
+  './assets/build/page.bab9282d50.min.js',
   './manifest.webmanifest',
-  './assets/samara-buffalo-logo.webp',
-  './assets/samara-dahi-bowl.webp',
-  './assets/samara-delaval-milking.webp',
-  './assets/samara-ghee-jar.webp',
-  './assets/samara-milk-bottle.webp',
-  './assets/samara-hero-3d-wide.webp',
-  './assets/samara-mark.svg'
+  './assets/samara-heritage-logo.jpg',
+  './assets/samara-heritage-hero.jpg'
 ];
 
 self.addEventListener('install', event => {
@@ -53,6 +43,21 @@ self.addEventListener('fetch', event => {
   const privatePaths = new Set(['/track.html', '/support.html', '/manage-subscription.html', '/admin.html']);
 
   if (url.origin === self.location.origin && event.request.method === 'GET' && !url.pathname.startsWith('/api/') && !privatePaths.has(url.pathname)) {
+    // Always prefer fresh HTML. Serving a cached homepage first can leave visitors
+    // running an older navigation script until they reload a second time.
+    if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+      event.respondWith(
+        fetch(event.request).then(networkResponse => {
+          if (networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)));
+          }
+          return networkResponse;
+        }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
+      );
+      return;
+    }
+
     event.respondWith(
       caches.match(event.request).then(cachedResponse => {
         if (cachedResponse) {

@@ -10,7 +10,10 @@ export function initFarmTour({ safeStore }) {
   const dateInput = document.querySelector('#tour-date');
   const guestsSelect = document.querySelector('#tour-guests');
   const totalCost = document.querySelector('#tour-total-cost');
+  const feedback = document.querySelector('#tour-feedback');
+  const submitButton = form?.querySelector('[type="submit"]');
   const opener = document.querySelector('#tour-header-btn');
+  const phoneInput = document.querySelector('#tour-phone');
   let returnFocus = opener;
   const modalManager = window.SamaraModal;
 
@@ -36,10 +39,14 @@ export function initFarmTour({ safeStore }) {
   openModal = () => {
     returnFocus = document.activeElement;
     const name = document.querySelector('#tour-name');
-    const phone = document.querySelector('#tour-phone');
     if (name) name.value = safeStore.get(localStorage, 'samara-name') || '';
-    if (phone) phone.value = safeStore.get(localStorage, 'samara-mobile') || '';
+    if (phoneInput) phoneInput.value = safeStore.get(localStorage, 'samara-mobile') || '';
     if (guestsSelect) guestsSelect.value = '1';
+    if (feedback) {
+      feedback.textContent = '';
+      feedback.classList.remove('show');
+    }
+    if (submitButton) submitButton.innerHTML = 'BOOK VIA WHATSAPP <span>→</span>';
     updateCost();
     if (modalManager) {
       modalManager.open(modal, returnFocus, closeButton);
@@ -54,6 +61,9 @@ export function initFarmTour({ safeStore }) {
   };
 
   guestsSelect?.addEventListener('change', updateCost);
+  phoneInput?.addEventListener('input', () => {
+    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+  });
   if (!modalManager) {
     closeButton?.addEventListener('click', close);
     modal?.querySelector('.modal-backdrop')?.addEventListener('click', close);
@@ -67,9 +77,15 @@ export function initFarmTour({ safeStore }) {
     const slot = document.querySelector('#tour-slot')?.value;
     safeStore.set(localStorage, 'samara-name', name);
     safeStore.set(localStorage, 'samara-mobile', phone);
-    const message = `*SAMARA ORGANICS FARM TOUR BOOKING*\n----------------------------------\n*Customer Details:*\n• Name: ${name}\n• Phone: +91 ${phone}\n• Number of Guests: ${guests}\n• Selected Date: ${selectedDate ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString('en-IN') : ''}\n• Timing Slot: ${slot}\n\n*Booking Ticket Cost:* ₹${guests * 99}\n----------------------------------\nWe would love to visit your farm! 🌿`;
-    window.open(`https://wa.me/918077366897?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-    close();
+    const message = `*SAMARA ORGANICS FARM TOUR BOOKING*\n----------------------------------\n*Customer Details:*\n• Name: ${name}\n• Phone: +91 ${phone}\n• Number of Guests: ${guests}\n• Selected Date: ${selectedDate ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString('en-IN') : ''}\n• Timing Slot: ${slot}\n\n*Standard Booking Ticket Cost:* ₹${guests * 99}\n*Founding Subscriber Offer:* Please confirm whether this booking qualifies for the complimentary farm tour for the first 14 confirmed subscribers.\n----------------------------------\nWe would love to welcome you to our farm! 🌿`;
+    const url = `https://wa.me/918077366897?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener');
+    if (feedback) {
+      feedback.innerHTML = `Your booking message is ready. Send it in WhatsApp to request confirmation. <a href="${url}" target="_blank" rel="noopener">OPEN WHATSAPP →</a>`;
+      feedback.classList.add('show');
+      feedback.focus({ preventScroll: false });
+    }
+    if (submitButton) submitButton.innerHTML = 'OPEN WHATSAPP AGAIN <span>→</span>';
   });
   return { open: openModal };
 }

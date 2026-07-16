@@ -10,7 +10,7 @@
     "build": "node scripts/build-assets.mjs",
     "test": "node tests/static-audit.mjs && node tests/date-handling.mjs && node tests/config.mjs && node tests/operations-config.mjs && node tests/backup.mjs && node tests/smoke.mjs",
     "test:browser": "node tests/browser-accessibility.mjs",
-    "check": "node --check server.js && node --check database.js && node --check script.js && node --check commerce.js && node --check farm-tour.js && node --check subscription-booking.js && node --check support.js && node --check manage-subscription.js && node --check page.js && node --check tracking.js && node --check service-worker.js && node --check scripts/build-assets.mjs && node --check scripts/backup-db.mjs && node --check scripts/maintain-db.mjs && node --check scripts/operations-worker.mjs"
+    "check": "node --check server.js && node --check production-config.js && node --check database.js && node --check script.js && node --check commerce.js && node --check farm-tour.js && node --check subscription-booking.js && node --check support.js && node --check manage-subscription.js && node --check page.js && node --check tracking.js && node --check service-worker.js && node --check scripts/build-assets.mjs && node --check scripts/backup-db.mjs && node --check scripts/maintain-db.mjs && node --check scripts/operations-worker.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -46,7 +46,8 @@ for (const page of pages) {
 }
 const workerPath = join(root, 'service-worker.js');
 let worker = await readFile(workerPath, 'utf8');
-worker = worker.replace(/const CACHE_NAME = '[^']+';/, `const CACHE_NAME = 'samara-cache-${built.get('styles.css').match(/styles\.([a-f0-9]+)/)[1]}';`);
+const releaseHash = createHash('sha256').update([...built.values()].join('|')).digest('hex').slice(0, 10);
+worker = worker.replace(/const CACHE_NAME = '[^']+';/, `const CACHE_NAME = 'samara-cache-${releaseHash}';`);
 const workerNames = { 'styles.css': 'styles', 'farm-tour.js': 'farm-tour', 'subscription-booking.js': 'subscription-booking', 'commerce.js': 'commerce', 'script.js': 'app', 'page.js': 'page', 'tracking.js': 'tracking', 'support.js': 'support', 'manage-subscription.js': 'subscription-manager' };
 for (const sourceName of Object.keys(workerNames)) {
   const output = `./${built.get(sourceName)}`;

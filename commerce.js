@@ -17,6 +17,7 @@ try {
   cart = {};
 }
 let activeOrderIdempotencyKey = null;
+let orderSubmissionInProgress = false;
 let lastCartFingerprint = JSON.stringify(cart);
 
 const drawer = document.querySelector('.drawer');
@@ -36,20 +37,31 @@ const checkoutDate = document.querySelector('#checkout-date');
 const checkoutPincode = document.querySelector('#checkout-pincode');
 const checkoutSlot = document.querySelector('#checkout-slot');
 const checkoutRouteStatus = document.querySelector('#checkout-route-status');
+const checkoutFeedback = document.querySelector('#checkout-feedback');
 const successCloseBtn = document.querySelector('.success-close-btn');
 const cartClearBtn = document.querySelector('.cart-clear-btn');
 
 let drawerReturnFocus = null;
 
+function setCheckoutFeedback(message = '') {
+  if (!checkoutFeedback) return;
+  checkoutFeedback.textContent = message;
+  checkoutFeedback.classList.toggle('show', Boolean(message));
+}
+
 if (checkoutDate) {
-  const localDate = offset => {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  };
-  checkoutDate.min = localDate(0);
-  checkoutDate.max = localDate(30);
-  checkoutDate.value ||= localDate(1);
+  const indiaDate = offset => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + offset * 86400000));
+  checkoutDate.min = indiaDate(0);
+  checkoutDate.max = indiaDate(30);
+  checkoutDate.value ||= indiaDate(1);
+}
+
+async function readApiJson(response, fallbackMessage) {
+  let data;
+  try { data = await response.json(); }
+  catch { throw new Error(fallbackMessage); }
+  if (!response.ok || !data.success) throw new Error(data.message || fallbackMessage);
+  return data;
 }
 
 async function refreshDeliveryAvailability() {
@@ -60,8 +72,7 @@ async function refreshDeliveryAvailability() {
   checkoutRouteStatus.textContent = 'Checking live route capacity…';
   try {
     const response = await fetch(`/api/serviceability/${encodeURIComponent(pincode)}?date=${encodeURIComponent(date)}`, { cache: 'no-store' });
-    const data = await response.json();
-    if (!response.ok || !data.success) throw new Error(data.message || 'Unable to check delivery capacity.');
+    const data = await readApiJson(response, 'Unable to check delivery capacity. Please try again.');
     for (const option of checkoutSlot.options) option.disabled = !data.slots.some(slot => slot.deliverySlot === option.value && slot.available);
     if (checkoutSlot.selectedOptions[0]?.disabled) checkoutSlot.value = [...checkoutSlot.options].find(option => !option.disabled)?.value || '';
     checkoutRouteStatus.textContent = !data.serviceable ? 'This PIN code is not on an active route yet.' : !data.acceptingOrders ? 'All delivery slots are full for this date.' : 'Live delivery capacity confirmed.';
@@ -95,6 +106,7 @@ function showView(view) {
     else if (view === 'checkout') title.textContent = 'Delivery Details';
     else if (view === 'success') title.textContent = 'Success';
   }
+  if (view !== 'checkout') setCheckoutFeedback('');
 }
 
 function openDrawer(opener = document.activeElement) {
@@ -350,12 +362,20 @@ paymentOptions.forEach(radio => {
 });
 
 async function submitOrder(withWhatsApp) {
-  if (!(await refreshDeliveryAvailability())) return;
+  if (orderSubmissionInProgress) return;
+  orderSubmissionInProgress = true;
+  setCheckoutFeedback('');
+  if (!(await refreshDeliveryAvailability())) {
+    orderSubmissionInProgress = false;
+    return;
+  }
   const paymentMethod = document.querySelector('input[name="checkout-payment"]:checked').value;
   const utrVal = document.querySelector('#checkout-utr')?.value.trim() || '';
   
   if (paymentMethod === 'UPI' && utrVal.length !== 12) {
-    alert('Please enter a valid 12-digit UPI Transaction ID (UTR).');
+    setCheckoutFeedback('Please enter a valid 12-digit UPI transaction ID.');
+    utrInput?.focus();
+    orderSubmissionInProgress = false;
     return;
   }
   
@@ -372,6 +392,7 @@ async function submitOrder(withWhatsApp) {
   if (withWhatsApp && submitBtn) {
     submitBtn.innerHTML = `PROCESSING... <span class="spinner-icon"></span>`;
   }
+  checkoutForm?.setAttribute('aria-busy', 'true');
   
   const name = document.querySelector('#checkout-name').value.trim();
   const phone = document.querySelector('#checkout-phone').value.trim();
@@ -400,11 +421,8 @@ async function submitOrder(withWhatsApp) {
       utr: paymentMethod === 'UPI' ? utrVal : null
     })
   })
-  .then(res => res.json())
+  .then(res => readApiJson(res, 'The order service returned an unreadable response. Please try again.'))
   .then(data => {
-    if (!data.success) {
-      throw new Error(data.message || 'Server error.');
-    }
     activeOrderIdempotencyKey = null;
     
     const successTitle = document.querySelector('.success-title');
@@ -450,32 +468,30 @@ Thank you for choosing Samara Organics! 🌿`;
 
       const url = `https://wa.me/918077366897?text=${encodeURIComponent(message)}`;
       
-      setTimeout(() => {
-        window.open(url, '_blank', 'noopener');
-        if (successTitle) successTitle.textContent = "Order Logged!";
-        if (successMsg) successMsg.innerHTML = `Please send the pre-filled WhatsApp message to confirm your order. <a href="${trackingUrl}" style="display:block;margin-top:10px;color:var(--olive);font-weight:700">TRACK ORDER #${data.orderId} →</a>`;
-        finalizeOrder();
-      }, 950);
+      window.open(url, '_blank', 'noopener');
+      if (successTitle) successTitle.textContent = "Order Logged!";
+      if (successMsg) successMsg.innerHTML = `Your order is safely recorded. Send the prepared message to confirm it with our team. <a href="${url}" target="_blank" rel="noopener" class="success-primary-link">OPEN WHATSAPP TO CONFIRM →</a><a href="${trackingUrl}" class="success-secondary-link">TRACK ORDER #${data.orderId} →</a>`;
+      finalizeOrder();
     } else {
-      setTimeout(() => {
-        if (successTitle) successTitle.textContent = "Order Placed!";
-        if (successMsg) successMsg.innerHTML = `Your order #${data.orderId} has been recorded. Our team will call +91 ${phone} to confirm delivery. <a href="${trackingUrl}" style="display:block;margin-top:10px;color:var(--olive);font-weight:700">TRACK YOUR ORDER →</a>`;
-        finalizeOrder();
-      }, 950);
+      if (successTitle) successTitle.textContent = "Order Placed!";
+      if (successMsg) successMsg.innerHTML = `Your order #${data.orderId} has been recorded. Our team will call +91 ${phone} to confirm delivery. <a href="${trackingUrl}" class="success-primary-link">TRACK YOUR ORDER →</a>`;
+      finalizeOrder();
     }
     
     function finalizeOrder() {
+      orderSubmissionInProgress = false;
+      checkoutForm?.removeAttribute('aria-busy');
       cart = {};
       safeStore.set(localStorage, 'samara-cart', '{}');
       renderCart();
       
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = `PLACE ORDER VIA WHATSAPP <span>→</span>`;
+        submitBtn.innerHTML = `PLACE &amp; CONFIRM ON WHATSAPP <span>→</span>`;
       }
       if (directBtn) {
         directBtn.disabled = false;
-        directBtn.innerHTML = `DIRECT WEBSITE ORDER <span>✓</span>`;
+        directBtn.innerHTML = `PLACE WEBSITE ORDER <span>✓</span>`;
       }
       
       if (upiBox) upiBox.style.display = 'none';
@@ -492,15 +508,18 @@ Thank you for choosing Samara Organics! 🌿`;
     }
   })
   .catch(err => {
+    orderSubmissionInProgress = false;
     console.error('Error submitting order:', err);
-    alert('Failed to place order: ' + err.message);
+    checkoutForm?.removeAttribute('aria-busy');
+    setCheckoutFeedback(`We could not place the order: ${err.message}`);
+    checkoutFeedback?.focus({ preventScroll: false });
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = `PLACE ORDER VIA WHATSAPP <span>→</span>`;
+      submitBtn.innerHTML = `PLACE &amp; CONFIRM ON WHATSAPP <span>→</span>`;
     }
     if (directBtn) {
       directBtn.disabled = false;
-      directBtn.innerHTML = `DIRECT WEBSITE ORDER <span>✓</span>`;
+      directBtn.innerHTML = `PLACE WEBSITE ORDER <span>✓</span>`;
     }
   });
 }

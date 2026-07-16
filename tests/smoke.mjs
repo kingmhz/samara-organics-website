@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createHmac } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 
 const port = 4400 + Math.floor(Math.random() * 300);
-const base = `http://127.0.0.1:${port}`;
+const externalBase = String(process.env.SAMARA_TEST_BASE_URL || '').replace(/\/$/, '');
+const externalLogPath = process.env.SAMARA_TEST_LOG_PATH;
+const base = externalBase || `http://127.0.0.1:${port}`;
 const adminUsername = 'smoke-admin';
 const adminPassword = 'Smoke-Test:Password-42!';
 const webhookSecret = 'smoke-webhook-secret';
@@ -11,13 +14,13 @@ const idempotencyEncryptionKey = 'smoke-idempotency-encryption-key-42-secure';
 const basicAuth = `Basic ${Buffer.from(`${adminUsername}:${adminPassword}`).toString('base64')}`;
 let output = '';
 
-const child = spawn(process.execPath, ['server.js'], {
+const child = externalBase ? null : spawn(process.execPath, ['server.js'], {
   cwd: process.cwd(),
   env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', NODE_ENV: 'test', DATABASE_PATH: ':memory:', ADMIN_USERNAME: adminUsername, ADMIN_PASSWORD: adminPassword, PAYMENT_WEBHOOK_SECRET: webhookSecret, IDEMPOTENCY_ENCRYPTION_KEY: idempotencyEncryptionKey, SERVICEABLE_PIN_PREFIXES: '20,202,203' },
   stdio: ['ignore', 'pipe', 'pipe']
 });
-child.stdout.on('data', chunk => { output += chunk; });
-child.stderr.on('data', chunk => { output += chunk; });
+child?.stdout.on('data', chunk => { output += chunk; });
+child?.stderr.on('data', chunk => { output += chunk; });
 
 async function waitForReady() {
   for (let attempt = 0; attempt < 60; attempt += 1) {
@@ -36,6 +39,12 @@ async function jsonRequest(path, options = {}) {
   return { response, data };
 }
 
+function structuredDataFrom(html) {
+  const match = html.match(/<script\b[^>]*id="site-structured-data"[^>]*>([\s\S]*?)<\/script>/i);
+  assert.ok(match, 'Rendered homepage must include live structured data.');
+  return JSON.parse(match[1]);
+}
+
 try {
   await waitForReady();
 
@@ -49,6 +58,10 @@ try {
   assert.doesNotMatch(health.response.headers.get('content-security-policy'), /script-src[^;]*'unsafe-inline'/);
   const home = await fetch(`${base}/`);
   const homeHtml = await home.text();
+  const initialStructuredData = structuredDataFrom(homeHtml);
+  assert.equal(initialStructuredData['@graph'].filter(entry => entry['@type'] === 'Product').length, 3);
+  assert.match(home.headers.get('cache-control'), /no-cache/);
+  assert.match(home.headers.get('content-security-policy'), /script-src 'self' 'sha256-/);
   assert.doesNotMatch(homeHtml, /fonts\.(?:googleapis|gstatic)\.com/);
   const localFont = await fetch(`${base}/assets/fonts/manrope-latin.woff2`);
   assert.equal(localFont.status, 200);
@@ -76,6 +89,16 @@ try {
   assert.equal(serviceable.data.slots.length, 2);
   const unsupported = await jsonRequest('/api/serviceability/999999');
   assert.equal(unsupported.data.serviceable, false);
+  for (const privatePath of ['/api/orders/track/not-a-token', '/api/subscriptions/manage/not-a-token', '/api/support/tickets/not-a-token']) {
+    const invalidPrivateLink = await jsonRequest(privatePath);
+    assert.equal(invalidPrivateLink.response.status, 400, `${privatePath} must reject malformed private references.`);
+    assert.equal(invalidPrivateLink.data.success, false);
+  }
+  const unknownApi = await jsonRequest('/api/route-that-does-not-exist');
+  assert.equal(unknownApi.response.status, 404);
+  assert.match(unknownApi.response.headers.get('content-type'), /application\/json/);
+  assert.match(unknownApi.response.headers.get('cache-control'), /no-store/);
+  assert.equal(unknownApi.data.message, 'API endpoint not found.');
 
   assert.equal((await fetch(`${base}/admin.html`)).status, 401);
   for (const sensitivePath of ['/server.js', '/database.js', '/commerce.js', '/styles.css', '/scripts/backup-db.mjs', '/tests/smoke.mjs', '/backups/latest.db', '/data/samara.db', '/samara.db']) {
@@ -145,6 +168,7 @@ try {
   const managementPath = `/api/subscriptions/manage/${subscription.data.managementToken}`;
   const managed = await jsonRequest(managementPath);
   assert.equal(managed.response.status, 200);
+  assert.equal((await jsonRequest(`/api/subscriptions/manage/${subscription.data.managementToken.toUpperCase()}`)).response.status, 200, 'Private subscription links must remain valid if a browser or messaging app changes UUID letter case.');
   assert.equal(managed.data.subscription.phone, '******3211');
   assert.equal(managed.data.subscription.pincode, '202001');
   assert.equal(managed.data.subscription.address, '456 Medical Road, Aligarh, Uttar Pradesh');
@@ -261,11 +285,16 @@ try {
   assert.equal(catalogUpdate.response.status, 200);
   const updatedCatalog = await jsonRequest('/api/catalog');
   assert.equal(updatedCatalog.data.products.find(product => product.name === 'Organic A2 Milk').price, 125);
-  const disableDahi = await jsonRequest('/api/admin/catalog/Traditional%20Dahi', { method: 'PUT', headers: { Authorization: basicAuth, 'Content-Type': 'application/json' }, body: JSON.stringify({ price: 89, unit: '500 ML', active: false, sort_order: 3 }) });
+  const updatedHomeHtml = await (await fetch(`${base}/`)).text();
+  const updatedStructuredProducts = structuredDataFrom(updatedHomeHtml)['@graph'].filter(entry => entry['@type'] === 'Product');
+  assert.equal(updatedStructuredProducts.find(product => product.name === 'Farm Fresh Milk').offers.price, 125);
+  const disableDahi = await jsonRequest('/api/admin/catalog/Traditional%20Dahi', { method: 'PUT', headers: { Authorization: basicAuth, 'Content-Type': 'application/json' }, body: JSON.stringify({ price: 89, unit: '500 G', active: false, sort_order: 3 }) });
   assert.equal(disableDahi.response.status, 200);
+  const unavailableStructuredProducts = structuredDataFrom(await (await fetch(`${base}/`)).text())['@graph'].filter(entry => entry['@type'] === 'Product');
+  assert.equal(unavailableStructuredProducts.find(product => product.name === 'Traditional Dahi').offers.availability, 'https://schema.org/OutOfStock');
   const inactiveOrder = await jsonRequest('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Inactive Product', phone: '9876543214', pincode: '202001', address: '14 Catalog Road, Aligarh', slot: 'Evening (6:00 PM - 9:00 PM)', items: { 'Traditional Dahi': { qty: 1, delivery: 'one-time' } }, payment_method: 'COD' }) });
   assert.equal(inactiveOrder.response.status, 400);
-  await jsonRequest('/api/admin/catalog/Traditional%20Dahi', { method: 'PUT', headers: { Authorization: basicAuth, 'Content-Type': 'application/json' }, body: JSON.stringify({ price: 89, unit: '500 ML', active: true, sort_order: 3 }) });
+  await jsonRequest('/api/admin/catalog/Traditional%20Dahi', { method: 'PUT', headers: { Authorization: basicAuth, 'Content-Type': 'application/json' }, body: JSON.stringify({ price: 89, unit: '500 G', active: true, sort_order: 3 }) });
   const routeUpdate = await jsonRequest('/api/admin/routes/202', { method: 'PUT', headers: { Authorization: basicAuth, 'Content-Type': 'application/json' }, body: JSON.stringify({ delivery_slot: 'Morning (6:00 AM - 9:00 AM)', max_orders: 1, max_units: 200, active: true }) });
   assert.equal(routeUpdate.response.status, 200);
   const fullMorning = await jsonRequest(`/api/serviceability/202001?date=${tracking.data.order.deliveryDate}`);
@@ -349,6 +378,10 @@ try {
   assert.equal((await jsonRequest(managementPath, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'resume' }) })).response.status, 409);
 
   await new Promise(resolve => setTimeout(resolve, 50));
+  if (externalBase) {
+    assert.ok(externalLogPath, 'SAMARA_TEST_LOG_PATH is required with an external smoke-test server.');
+    output = await readFile(externalLogPath, 'utf8');
+  }
   for (const privateReference of [order.data.trackingToken, subscription.data.managementToken, support.data.statusToken]) {
     assert.equal(output.includes(privateReference), false, 'Private bearer references must be redacted from logs.');
   }
@@ -362,9 +395,11 @@ try {
   console.error(output);
   process.exitCode = 1;
 } finally {
-  child.kill('SIGTERM');
-  await Promise.race([
-    new Promise(resolve => child.once('exit', resolve)),
-    new Promise(resolve => setTimeout(resolve, 3000))
-  ]);
+  if (child) {
+    child.kill('SIGTERM');
+    await Promise.race([
+      new Promise(resolve => child.once('exit', resolve)),
+      new Promise(resolve => setTimeout(resolve, 3000))
+    ]);
+  }
 }

@@ -202,6 +202,7 @@
     .form-submit-btn:hover {
       background: var(--forest2);
     }
+    .form-submit-btn:disabled { cursor:wait; opacity:.64; filter:saturate(.55); }
     
     .loading-text {
       text-align: center;
@@ -220,9 +221,16 @@
       width: auto;
       margin: 0;
     }
-    .operation-row label { font-size: 9px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
-    .operation-row input, .operation-row select { width: 100%; margin-top: 6px; min-height: 40px; padding: 8px; border: 1px solid var(--line); background: var(--cream); }
-    @media (max-width: 900px) { .operation-row { grid-template-columns: 1fr 1fr !important; } .tabs { overflow-x: auto; } }
+    .operation-row { display:grid; align-items:end; gap:10px; margin:14px 0; min-width:0; }
+    .operation-row.catalog-row { grid-template-columns:minmax(150px,1fr) 100px 110px 85px 85px 90px; }
+    .operation-row.inventory-row { grid-template-columns:minmax(160px,1fr) 110px 110px 120px 105px 115px; padding-bottom:16px; border-bottom:1px solid var(--line); }
+    .operation-row.route-row { grid-template-columns:90px minmax(170px,1fr) 100px 100px 85px 90px; }
+    .operation-row > *, .operation-row label { min-width:0; }
+    .operation-row > b, .operation-row > div, .operation-row > span { overflow-wrap:anywhere; }
+    .operation-row label { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+    .operation-row input, .operation-row select { width: 100%; margin-top: 6px; min-height: 44px; padding: 8px; border: 1px solid var(--line); background: var(--cream); font:16px Manrope,sans-serif; }
+    .operation-row .form-submit-btn { min-height:44px; padding:10px 8px; }
+    @media (max-width: 1050px) { .operation-row.catalog-row, .operation-row.inventory-row, .operation-row.route-row { grid-template-columns:repeat(3,minmax(0,1fr)); } .tabs { overflow-x: auto; } }
     .support-update { display:grid; gap:7px; min-width:220px; }
     .support-update select, .support-update textarea { width:100%; padding:8px; border:1px solid var(--line); background:var(--cream); font:12px Manrope,sans-serif; }
     .support-update textarea { min-height:75px; resize:vertical; }
@@ -238,8 +246,32 @@
     .dashboard-list b { display:block; font:600 20px "Cormorant Garamond"; margin-bottom:8px; }
     .route-meter { height:5px; background:var(--cream); margin:6px 0 12px; overflow:hidden; }
     .route-meter i { display:block; height:100%; background:var(--olive); }
-    @media(max-width:900px){.dashboard-grid{grid-template-columns:1fr 1fr}.dashboard-alerts{grid-template-columns:1fr}}
+    @media(max-width:900px){.dashboard-grid{grid-template-columns:1fr 1fr}.dashboard-alerts{grid-template-columns:1fr}.manifest-summary{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}}
     .manifest-tools{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:18px}.manifest-tools label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--gold)}.manifest-tools input{display:block;margin-top:6px;min-height:40px;border:1px solid var(--line);background:var(--ivory);padding:0 12px;font:600 12px Manrope}.manifest-tools button{min-height:40px;border:0;background:var(--forest);color:white;padding:0 18px;font:700 10px Manrope;letter-spacing:.09em;cursor:pointer}.manifest-tools button.secondary{background:var(--ivory);border:1px solid var(--line);color:var(--forest)}.manifest-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 18px}.manifest-summary div{background:var(--ivory);border:1px solid var(--line);padding:14px}.manifest-summary small,.manifest-summary strong{display:block}.manifest-summary small{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.08em}.manifest-summary strong{font:600 27px "Cormorant Garamond";margin-top:6px;color:var(--forest)}.manifest-stock{margin:-4px 0 18px;padding:13px 15px;border:1px solid #b8ccb9;background:#edf6ee;color:#24542d;font-size:12px;line-height:1.55}.manifest-stock.shortage{border-color:#d7a49a;background:#fff0ed;color:#813b2d}.manifest-stock b{display:block;margin-bottom:3px}
+    .admin-notice{position:fixed;z-index:1000;top:18px;right:18px;width:min(390px,calc(100vw - 36px));padding:15px 48px 15px 18px;border:1px solid rgba(101,120,60,.4);background:#f4f8ed;color:#294627;box-shadow:0 18px 50px rgba(8,45,32,.2);font-size:12px;line-height:1.55;opacity:0;visibility:hidden;transform:translateY(-12px) scale(.98);transition:opacity .25s,transform .35s cubic-bezier(.22,1,.36,1),visibility .25s}.admin-notice.show{opacity:1;visibility:visible;transform:none}.admin-notice.error{border-color:#d7a49a;background:#fff0ed;color:#813b2d}.admin-notice::after{content:"✓";position:absolute;right:17px;top:50%;transform:translateY(-50%);font:700 20px "Cormorant Garamond"}.admin-notice.error::after{content:"!"}
+    @media(max-width:600px){
+      header{align-items:flex-start;flex-direction:column;gap:12px;padding:20px}
+      header h1{font-size:24px;line-height:1.2}
+      .container{padding:26px 16px}
+      .tabs{gap:4px;margin-inline:-16px;padding-inline:16px;scrollbar-width:thin;scroll-snap-type:x proximity}
+      .tab-btn{flex:0 0 auto;min-height:44px;padding:11px 14px;white-space:nowrap;scroll-snap-align:start}
+      .dashboard-head{align-items:flex-start;flex-wrap:wrap}
+      .dashboard-head h2{font-size:30px}
+      .dashboard-grid{grid-template-columns:1fr}
+      .manifest-summary{grid-template-columns:1fr 1fr}
+      .form-card{padding:20px 16px}
+      .operation-row.catalog-row,.operation-row.inventory-row,.operation-row.route-row{grid-template-columns:1fr}
+      .operation-row{padding:16px 0;margin:0;border-bottom:1px solid var(--line)}
+      .operation-row:last-child{border-bottom:0}
+      .operation-row .form-submit-btn{min-height:48px}
+      .manifest-tools>*{flex:1 1 140px}
+      .manifest-tools input,.manifest-tools button{width:100%;min-height:46px;font-size:16px}
+      .table-container{margin-inline:-16px;border-inline:0}
+      table{min-width:760px}
+      .form-group input,.form-group select{font-size:16px;min-height:46px}
+    }
+    @media(max-width:380px){.manifest-summary{grid-template-columns:1fr}.admin-notice{top:10px;right:10px;width:calc(100vw - 20px)}}
+    @media(prefers-reduced-motion:reduce){.panel,.admin-notice{animation:none;transition:none;transform:none}.admin-notice:not(.show){opacity:0}}
     @media print{body>*{display:none!important}.container{display:block!important;padding:0!important}.container>*{display:none!important}#manifest-panel{display:block!important}.manifest-tools,.tabs{display:none!important}.table-container{box-shadow:none;border:0}header{display:none!important}}
   </style>
 </head>
@@ -249,20 +281,21 @@
     <h1>SAMARA ORGANICS <span>• Farm Administration</span></h1>
     <a href="/" style="color: var(--palegold); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;">VIEW WEBSITE →</a>
   </header>
+  <div class="admin-notice" id="admin-notice" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <div class="container">
     <section aria-labelledby="dashboard-title"><div class="dashboard-head"><div><h2 id="dashboard-title">Operations overview</h2><small id="dashboard-date">Loading live farm data…</small></div><button type="button" id="refresh-dashboard">REFRESH</button></div><div class="dashboard-grid" id="dashboard-cards"></div><div class="dashboard-alerts"><div class="dashboard-list" id="stock-alerts"><b>Inventory</b>Loading…</div><div class="dashboard-list" id="route-utilization"><b>Tomorrow's routes</b>Loading…</div></div></section>
-    <div class="tabs">
-      <button class="tab-btn active" data-target="orders-panel">ORDERS LOG</button>
-      <button class="tab-btn" data-target="manifest-panel">DELIVERY MANIFEST</button>
-      <button class="tab-btn" data-target="subs-panel">SUBSCRIBERS ROSTER</button>
-      <button class="tab-btn" data-target="operations-panel">INVENTORY &amp; ROUTES</button>
-      <button class="tab-btn" data-target="support-panel">CUSTOMER CARE</button>
-      <button class="tab-btn" data-target="audit-panel">AUDIT LOG</button>
-      <button class="tab-btn" data-target="batches-panel">TRACEABILITY BATCHES</button>
+    <div class="tabs" role="tablist" aria-label="Administration sections">
+      <button type="button" class="tab-btn active" id="tab-orders" role="tab" aria-selected="true" aria-controls="orders-panel" data-target="orders-panel">ORDERS LOG</button>
+      <button type="button" class="tab-btn" id="tab-manifest" role="tab" aria-selected="false" aria-controls="manifest-panel" tabindex="-1" data-target="manifest-panel">DELIVERY MANIFEST</button>
+      <button type="button" class="tab-btn" id="tab-subs" role="tab" aria-selected="false" aria-controls="subs-panel" tabindex="-1" data-target="subs-panel">SUBSCRIBERS ROSTER</button>
+      <button type="button" class="tab-btn" id="tab-operations" role="tab" aria-selected="false" aria-controls="operations-panel" tabindex="-1" data-target="operations-panel">INVENTORY &amp; ROUTES</button>
+      <button type="button" class="tab-btn" id="tab-support" role="tab" aria-selected="false" aria-controls="support-panel" tabindex="-1" data-target="support-panel">CUSTOMER CARE</button>
+      <button type="button" class="tab-btn" id="tab-audit" role="tab" aria-selected="false" aria-controls="audit-panel" tabindex="-1" data-target="audit-panel">AUDIT LOG</button>
+      <button type="button" class="tab-btn" id="tab-batches" role="tab" aria-selected="false" aria-controls="batches-panel" tabindex="-1" data-target="batches-panel">TRACEABILITY BATCHES</button>
     </div>
 
-    <div class="panel" id="manifest-panel">
+    <div class="panel" id="manifest-panel" role="tabpanel" aria-labelledby="tab-manifest" tabindex="0">
       <div class="dashboard-head"><div><h2>Daily delivery manifest</h2><small id="manifest-caption">Choose a delivery date.</small></div></div>
       <div class="manifest-tools"><label>DELIVERY DATE<input id="manifest-date" type="date"></label><button type="button" id="load-manifest">LOAD MANIFEST</button><button type="button" class="secondary" id="export-manifest" disabled>EXPORT CSV</button><button type="button" class="secondary" id="print-manifest" disabled>PRINT</button></div>
       <div class="manifest-summary" id="manifest-summary"></div>
@@ -271,7 +304,7 @@
     </div>
 
     <!-- Panel 1: Orders -->
-    <div class="panel active" id="orders-panel">
+    <div class="panel active" id="orders-panel" role="tabpanel" aria-labelledby="tab-orders" tabindex="0">
       <div class="table-container">
         <table id="orders-table">
           <thead>
@@ -294,7 +327,7 @@
     </div>
 
     <!-- Panel 2: Subscriptions -->
-    <div class="panel" id="subs-panel">
+    <div class="panel" id="subs-panel" role="tabpanel" aria-labelledby="tab-subs" tabindex="0">
       <div class="table-container">
         <table id="subs-table">
           <thead>
@@ -323,14 +356,14 @@
 
     <div class="panel" id="audit-panel"><div class="table-container"><table><thead><tr><th>TIME</th><th>ACTOR</th><th>ACTION</th><th>ENTITY</th><th>DETAILS</th><th>REQUEST</th></tr></thead><tbody id="audit-tbody"><tr><td colspan="6" class="loading-text">Loading audit trail…</td></tr></tbody></table></div></div>
 
-    <div class="panel" id="operations-panel">
+    <div class="panel" id="operations-panel" role="tabpanel" aria-labelledby="tab-operations" tabindex="0">
       <div class="form-card" style="margin-bottom:24px"><h3>Product Catalog</h3><p style="font-size:12px;color:var(--muted)">These prices, units and availability are authoritative for checkout and subscriptions.</p><div id="catalog-operations" class="loading-text">Loading catalog…</div></div>
       <div class="form-card" style="margin-bottom:24px"><h3>Available Inventory</h3><p style="font-size:12px;color:var(--muted)">Orders reserve this stock atomically. Cancelling an order or failing its payment returns the quantity.</p><div id="inventory-operations" class="loading-text">Loading inventory…</div></div>
       <div class="form-card"><h3>Route Capacity</h3><p style="font-size:12px;color:var(--muted)">Limits apply per PIN prefix, delivery slot and delivery date.</p><div id="route-operations" class="loading-text">Loading routes…</div></div>
     </div>
 
     <!-- Panel 4: Batches & Quality logs -->
-    <div class="panel" id="batches-panel">
+    <div class="panel" id="batches-panel" role="tabpanel" aria-labelledby="tab-batches" tabindex="0">
       <div class="form-grid">
         <div class="form-card">
           <h3>Create Quality Batch</h3>
@@ -366,10 +399,10 @@
               </label>
             </div>
             <div class="form-group">
-              <label for="batch-score">OVERALL PURITY SCORE (%)</label>
+              <label for="batch-score">RECORDED QUALITY SCORE (%)</label>
               <input type="number" id="batch-score" placeholder="e.g. 98" min="0" max="100" required>
             </div>
-            <button type="submit" class="form-submit-btn">LOG QUALITY CERTIFICATE</button>
+            <button type="submit" class="form-submit-btn">SAVE BATCH QUALITY RECORD</button>
           </form>
         </div>
 
@@ -401,6 +434,23 @@
     const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
     })[char]);
+    const adminNotice = document.getElementById('admin-notice');
+    let adminNoticeTimer;
+    const notify = (message, type = 'success') => {
+      clearTimeout(adminNoticeTimer);
+      adminNotice.textContent = message;
+      adminNotice.classList.toggle('error', type === 'error');
+      adminNotice.classList.remove('show');
+      requestAnimationFrame(() => adminNotice.classList.add('show'));
+      adminNoticeTimer = setTimeout(() => adminNotice.classList.remove('show'), type === 'error' ? 6500 : 4000);
+    };
+    const readAdminJson = async (response, fallbackMessage = 'The administration service returned an unreadable response.') => {
+      let data;
+      try { data = await response.json(); }
+      catch { throw new Error(fallbackMessage); }
+      if (!response.ok || !data.success) throw new Error(data.message || fallbackMessage);
+      return data;
+    };
     const orderTransitions = {
       'Pending': ['Confirmed', 'Cancelled'],
       'Awaiting Payment Verification': ['Confirmed', 'Payment Failed', 'Cancelled'],
@@ -414,20 +464,44 @@
     const tabBtns = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.panel');
     tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        panels.forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.target).classList.add('active');
-        if (btn.dataset.target === 'operations-panel') loadOperations();
-        if (btn.dataset.target === 'manifest-panel') loadManifest();
-        if (btn.dataset.target === 'support-panel') loadSupportTickets();
-        if (btn.dataset.target === 'audit-panel') loadAuditLog();
+      const panel = document.getElementById(btn.dataset.target);
+      panel?.setAttribute('role', 'tabpanel');
+      panel?.setAttribute('aria-labelledby', btn.id);
+      panel?.setAttribute('tabindex', '0');
+    });
+    const activateTab = (btn, moveFocus = false) => {
+      tabBtns.forEach(button => {
+        const active = button === btn;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+      });
+      panels.forEach(panel => panel.classList.toggle('active', panel.id === btn.dataset.target));
+      if (moveFocus) { btn.focus(); btn.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+      if (btn.dataset.target === 'operations-panel') loadOperations().catch(error => notify(error.message, 'error'));
+      if (btn.dataset.target === 'manifest-panel') loadManifest().catch(reportManifestError);
+      if (btn.dataset.target === 'support-panel') loadSupportTickets().catch(error => notify(error.message, 'error'));
+      if (btn.dataset.target === 'audit-panel') loadAuditLog().catch(error => notify(error.message, 'error'));
+    };
+    tabBtns.forEach((btn, index) => {
+      btn.addEventListener('click', () => activateTab(btn));
+      btn.addEventListener('keydown', event => {
+        const keyTarget = event.key === 'Home' ? 0 : event.key === 'End' ? tabBtns.length - 1 : event.key === 'ArrowRight' ? (index + 1) % tabBtns.length : event.key === 'ArrowLeft' ? (index - 1 + tabBtns.length) % tabBtns.length : -1;
+        if (keyTarget < 0) return;
+        event.preventDefault();
+        activateTab(tabBtns[keyTarget], true);
       });
     });
 
     let currentManifest = null;
     const manifestDate = document.getElementById('manifest-date');
+    const reportManifestError = error => {
+      currentManifest = null;
+      document.getElementById('manifest-tbody').innerHTML = `<tr><td colspan="7" class="loading-text" style="color:#a94442">${escapeHtml(error.message || 'Unable to load the delivery manifest.')}</td></tr>`;
+      document.getElementById('export-manifest').disabled = true;
+      document.getElementById('print-manifest').disabled = true;
+      notify(error.message || 'Unable to load the delivery manifest.', 'error');
+    };
     const indiaCalendarDate = (offsetDays = 0) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + offsetDays * 86400000));
     manifestDate.min = indiaCalendarDate();
     manifestDate.max = indiaCalendarDate(180);
@@ -436,8 +510,7 @@
       const tbody = document.getElementById('manifest-tbody');
       tbody.innerHTML = '<tr><td colspan="7" class="loading-text">Building route manifest…</td></tr>';
       const response = await fetch(`/api/admin/delivery-manifest?date=${encodeURIComponent(manifestDate.value)}`, { cache: 'no-store' });
-      const data = await response.json();
-      if (!response.ok || !data.success) { tbody.innerHTML = `<tr><td colspan="7">${escapeHtml(data.message || 'Unable to load manifest.')}</td></tr>`; return; }
+      const data = await readAdminJson(response, 'Unable to load the delivery manifest.');
       currentManifest = data;
       document.getElementById('manifest-caption').textContent = `Fulfilment plan for ${data.deliveryDate}`;
       document.getElementById('manifest-summary').innerHTML = [['STOPS', data.summary.stops], ['UNITS', data.summary.units], ['ORDERS', data.summary.orders], ['SUBSCRIPTIONS', data.summary.subscriptions]].map(([label, value]) => `<div><small>${label}</small><strong>${escapeHtml(value)}</strong></div>`).join('');
@@ -449,7 +522,7 @@
       document.getElementById('export-manifest').disabled = false;
       document.getElementById('print-manifest').disabled = false;
     }
-    document.getElementById('load-manifest').addEventListener('click', () => loadManifest().catch(error => alert(error.message)));
+    document.getElementById('load-manifest').addEventListener('click', () => loadManifest().catch(reportManifestError));
     document.getElementById('print-manifest').addEventListener('click', () => window.print());
     document.getElementById('export-manifest').addEventListener('click', () => {
       if (!currentManifest) return;
@@ -469,16 +542,16 @@
 
     async function loadOperations() {
       const response = await fetch('/api/admin/operations');
-      const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.message || 'Unable to load operations.');
-      document.getElementById('catalog-operations').innerHTML = data.catalog.map(item => `<form class="operation-row" data-catalog="${escapeHtml(item.product_name)}" style="display:grid;grid-template-columns:1fr 100px 100px 85px 85px 90px;gap:10px;align-items:end;margin:12px 0"><b>${escapeHtml(item.product_name)}</b><label>PRICE ₹<input name="price" type="number" min="1" value="${escapeHtml(item.price)}" required></label><label>UNIT<input name="unit" maxlength="30" value="${escapeHtml(item.unit)}" required></label><label>ORDER<input name="sort_order" type="number" min="0" value="${escapeHtml(item.sort_order)}" required></label><label>ACTIVE<select name="active"><option value="1" ${item.active ? 'selected' : ''}>Yes</option><option value="0" ${!item.active ? 'selected' : ''}>No</option></select></label><button class="form-submit-btn">SAVE</button></form>`).join('');
-      document.getElementById('inventory-operations').innerHTML = data.inventory.map(item => `<form class="operation-row" data-inventory="${escapeHtml(item.product_name)}" style="display:grid;grid-template-columns:minmax(150px,1fr) 110px 110px 120px 100px 110px;gap:10px;align-items:end;margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--line)"><div><b>${escapeHtml(item.product_name)}</b><small style="display:block;margin-top:5px;color:var(--muted)">Current stock: ${escapeHtml(item.available_qty)}</small></div><label>EXACT TOTAL<input name="available_qty" type="number" min="0" max="100000" value="${escapeHtml(item.available_qty)}" required></label><label>LOW STOCK<input name="low_stock_threshold" type="number" min="0" max="100000" value="${escapeHtml(item.low_stock_threshold)}" required></label><label>ADD / REMOVE<input name="adjustment" type="number" min="-100000" max="100000" placeholder="+50 or -10"></label><button class="form-submit-btn" name="inventory_action" value="set">SET TOTAL</button><button class="form-submit-btn" name="inventory_action" value="adjust">ADJUST STOCK</button></form>`).join('');
-      document.getElementById('route-operations').innerHTML = data.routes.map(route => `<form class="operation-row" data-route="${escapeHtml(route.pincode_prefix)}" style="display:grid;grid-template-columns:90px 1fr 100px 100px 85px 90px;gap:10px;align-items:end;margin:12px 0"><b>PIN ${escapeHtml(route.pincode_prefix)}…</b><input name="delivery_slot" type="hidden" value="${escapeHtml(route.delivery_slot)}"><span style="font-size:11px">${escapeHtml(route.delivery_slot)}</span><label>ORDERS<input name="max_orders" type="number" min="0" value="${escapeHtml(route.max_orders)}" required></label><label>UNITS<input name="max_units" type="number" min="0" value="${escapeHtml(route.max_units)}" required></label><label>ACTIVE<select name="active"><option value="1" ${route.active ? 'selected' : ''}>Yes</option><option value="0" ${!route.active ? 'selected' : ''}>No</option></select></label><button class="form-submit-btn">SAVE</button></form>`).join('');
+      const data = await readAdminJson(response, 'Unable to load operations.');
+      document.getElementById('catalog-operations').innerHTML = data.catalog.map(item => `<form class="operation-row catalog-row" data-catalog="${escapeHtml(item.product_name)}" aria-label="Edit ${escapeHtml(item.product_name)} catalogue settings"><b>${escapeHtml(item.product_name)}</b><label>PRICE ₹<input name="price" type="number" min="1" value="${escapeHtml(item.price)}" required></label><label>UNIT<input name="unit" maxlength="30" value="${escapeHtml(item.unit)}" required></label><label>ORDER<input name="sort_order" type="number" min="0" value="${escapeHtml(item.sort_order)}" required></label><label>ACTIVE<select name="active"><option value="1" ${item.active ? 'selected' : ''}>Yes</option><option value="0" ${!item.active ? 'selected' : ''}>No</option></select></label><button type="submit" class="form-submit-btn">SAVE</button></form>`).join('');
+      document.getElementById('inventory-operations').innerHTML = data.inventory.map(item => `<form class="operation-row inventory-row" data-inventory="${escapeHtml(item.product_name)}" aria-label="Update ${escapeHtml(item.product_name)} inventory"><div><b>${escapeHtml(item.product_name)}</b><small style="display:block;margin-top:5px;color:var(--muted)">Current stock: ${escapeHtml(item.available_qty)}</small></div><label>EXACT TOTAL<input name="available_qty" type="number" min="0" max="100000" value="${escapeHtml(item.available_qty)}" required></label><label>LOW STOCK<input name="low_stock_threshold" type="number" min="0" max="100000" value="${escapeHtml(item.low_stock_threshold)}" required></label><label>ADD / REMOVE<input name="adjustment" type="number" min="-100000" max="100000" placeholder="+50 or -10"></label><button type="submit" class="form-submit-btn" name="inventory_action" value="set">SET TOTAL</button><button type="submit" class="form-submit-btn" name="inventory_action" value="adjust">ADJUST STOCK</button></form>`).join('');
+      document.getElementById('route-operations').innerHTML = data.routes.map(route => `<form class="operation-row route-row" data-route="${escapeHtml(route.pincode_prefix)}" aria-label="Edit PIN ${escapeHtml(route.pincode_prefix)} route capacity"><b>PIN ${escapeHtml(route.pincode_prefix)}…</b><input name="delivery_slot" type="hidden" value="${escapeHtml(route.delivery_slot)}"><span style="font-size:11px">${escapeHtml(route.delivery_slot)}</span><label>ORDERS<input name="max_orders" type="number" min="0" value="${escapeHtml(route.max_orders)}" required></label><label>UNITS<input name="max_units" type="number" min="0" value="${escapeHtml(route.max_units)}" required></label><label>ACTIVE<select name="active"><option value="1" ${route.active ? 'selected' : ''}>Yes</option><option value="0" ${!route.active ? 'selected' : ''}>No</option></select></label><button type="submit" class="form-submit-btn">SAVE</button></form>`).join('');
     }
 
     document.getElementById('operations-panel').addEventListener('submit', async event => {
       event.preventDefault();
       const form = event.target;
+      const submitter = event.submitter;
       const isInventory = form.dataset.inventory;
       const isCatalog = form.dataset.catalog;
       const body = Object.fromEntries(new FormData(form));
@@ -487,39 +560,53 @@
       else if (isInventory && inventoryAction === 'adjust') {
         body.delta = Number(body.adjustment);
         body.note = 'Manual adjustment from the administration portal';
-        if (!Number.isInteger(body.delta) || body.delta === 0) return alert('Enter a non-zero whole number in ADD / REMOVE.');
+        if (!Number.isInteger(body.delta) || body.delta === 0) return notify('Enter a non-zero whole number in ADD / REMOVE.', 'error');
       }
       else if (isInventory) { body.available_qty = Number(body.available_qty); body.low_stock_threshold = Number(body.low_stock_threshold); }
       else { body.max_orders = Number(body.max_orders); body.max_units = Number(body.max_units); body.active = body.active === '1'; }
       const path = isCatalog ? `/api/admin/catalog/${encodeURIComponent(isCatalog)}` : isInventory ? `/api/admin/inventory/${encodeURIComponent(isInventory)}${inventoryAction === 'adjust' ? '/adjust' : ''}` : `/api/admin/routes/${encodeURIComponent(form.dataset.route)}`;
-      const response = await fetch(path, { method: isInventory && inventoryAction === 'adjust' ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      const data = await response.json();
-      if (!response.ok || !data.success) return alert(data.message || 'Update failed.');
-      alert(data.message);
-      loadOperations();
+      const originalLabel = submitter?.textContent;
+      if (submitter) { submitter.disabled = true; submitter.textContent = 'SAVING…'; }
+      try {
+        const response = await fetch(path, { method: isInventory && inventoryAction === 'adjust' ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await readAdminJson(response, 'Update failed.');
+        notify(data.message || 'Update saved.');
+        await Promise.all([loadOperations(), loadDashboard()]);
+      } catch (error) {
+        notify(error.message || 'Update failed.', 'error');
+      } finally {
+        if (submitter?.isConnected) { submitter.disabled = false; submitter.textContent = originalLabel; }
+      }
     });
 
     async function loadSupportTickets() {
       const tbody = document.getElementById('support-tbody');
       const response = await fetch('/api/admin/support-tickets');
-      const data = await response.json();
-      if (!response.ok || !data.success) { tbody.innerHTML = `<tr><td colspan="5">${escapeHtml(data.message || 'Unable to load support requests.')}</td></tr>`; return; }
-      tbody.innerHTML = data.tickets.length ? data.tickets.map(ticket => `<tr><td><b>${escapeHtml(ticket.public_reference)}</b><br><small>${escapeHtml(new Date(ticket.created_at).toLocaleString('en-IN'))}</small></td><td>${escapeHtml(ticket.name)}<br>${escapeHtml(ticket.phone)}<br>${escapeHtml(ticket.email || '')}</td><td>${escapeHtml(ticket.category)}<br><small>${escapeHtml(ticket.order_reference || 'No order reference')}</small></td><td style="max-width:320px;white-space:normal">${escapeHtml(ticket.message)}</td><td><form class="support-update" data-ticket="${ticket.id}"><select name="status"><option ${ticket.status === 'Received' ? 'selected' : ''}>Received</option><option ${ticket.status === 'In Review' ? 'selected' : ''}>In Review</option><option ${ticket.status === 'Waiting for Customer' ? 'selected' : ''}>Waiting for Customer</option><option ${ticket.status === 'Resolved' ? 'selected' : ''}>Resolved</option><option ${ticket.status === 'Closed' ? 'selected' : ''}>Closed</option></select><textarea name="resolution_note" maxlength="2000" placeholder="Customer-visible response">${escapeHtml(ticket.resolution_note || '')}</textarea><button class="form-submit-btn">SAVE</button></form></td></tr>`).join('') : '<tr><td colspan="5" class="loading-text">No support requests.</td></tr>';
+      const data = await readAdminJson(response, 'Unable to load support requests.');
+      tbody.innerHTML = data.tickets.length ? data.tickets.map(ticket => `<tr><td><b>${escapeHtml(ticket.public_reference)}</b><br><small>${escapeHtml(new Date(ticket.created_at).toLocaleString('en-IN'))}</small></td><td>${escapeHtml(ticket.name)}<br>${escapeHtml(ticket.phone)}<br>${escapeHtml(ticket.email || '')}</td><td>${escapeHtml(ticket.category)}<br><small>${escapeHtml(ticket.order_reference || 'No order reference')}</small></td><td style="max-width:320px;white-space:normal">${escapeHtml(ticket.message)}</td><td><form class="support-update" data-ticket="${escapeHtml(ticket.id)}"><select name="status" aria-label="Status for support request ${escapeHtml(ticket.public_reference)}"><option ${ticket.status === 'Received' ? 'selected' : ''}>Received</option><option ${ticket.status === 'In Review' ? 'selected' : ''}>In Review</option><option ${ticket.status === 'Waiting for Customer' ? 'selected' : ''}>Waiting for Customer</option><option ${ticket.status === 'Resolved' ? 'selected' : ''}>Resolved</option><option ${ticket.status === 'Closed' ? 'selected' : ''}>Closed</option></select><textarea name="resolution_note" maxlength="2000" aria-label="Customer-visible response for support request ${escapeHtml(ticket.public_reference)}" placeholder="Customer-visible response">${escapeHtml(ticket.resolution_note || '')}</textarea><button type="submit" class="form-submit-btn">SAVE</button></form></td></tr>`).join('') : '<tr><td colspan="5" class="loading-text">No support requests.</td></tr>';
     }
 
     document.getElementById('support-panel').addEventListener('submit', async event => {
       event.preventDefault();
       const form = event.target;
-      const response = await fetch(`/api/admin/support-tickets/${form.dataset.ticket}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
-      const data = await response.json();
-      if (!response.ok || !data.success) return alert(data.message || 'Update failed.');
-      loadSupportTickets();
+      const submitter = event.submitter;
+      const originalLabel = submitter?.textContent;
+      if (submitter) { submitter.disabled = true; submitter.textContent = 'SAVING…'; }
+      try {
+        const response = await fetch(`/api/admin/support-tickets/${form.dataset.ticket}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+        const data = await readAdminJson(response, 'Update failed.');
+        notify(data.message || 'Support request updated.');
+        await loadSupportTickets();
+      } catch (error) {
+        notify(error.message || 'Update failed.', 'error');
+      } finally {
+        if (submitter?.isConnected) { submitter.disabled = false; submitter.textContent = originalLabel; }
+      }
     });
 
     async function loadDashboard() {
       const response = await fetch('/api/admin/dashboard', { cache: 'no-store' });
-      const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.message || 'Unable to load dashboard.');
+      const data = await readAdminJson(response, 'Unable to load dashboard.');
       const count = (rows, statuses) => rows.filter(row => statuses.includes(row.status)).reduce((sum, row) => sum + row.count, 0);
       const cards = [
         ['TOTAL ORDERS', data.value.total_orders],
@@ -533,13 +620,12 @@
       document.getElementById('stock-alerts').innerHTML = `<b>Inventory</b>${data.inventory.map(item => `<div style="color:${item.low_stock ? '#a94442' : 'inherit'}">${escapeHtml(item.product_name)} — <strong>${item.available_qty}</strong>${item.low_stock ? ' · LOW STOCK' : ''}</div>`).join('')}`;
       document.getElementById('route-utilization').innerHTML = `<b>Tomorrow's routes</b>${data.routes.map(route => `<div>PIN ${escapeHtml(route.pincode_prefix)}… · ${escapeHtml(route.delivery_slot)}<br>${route.booked_orders}/${route.max_orders} orders · ${route.booked_units}/${route.max_units} units<div class="route-meter"><i style="width:${Math.min(100, Math.max(route.orderUtilization, route.unitUtilization))}%"></i></div></div>`).join('') || 'No active routes.'}`;
     }
-    document.getElementById('refresh-dashboard').addEventListener('click', () => loadDashboard().catch(error => alert(error.message)));
+    document.getElementById('refresh-dashboard').addEventListener('click', () => loadDashboard().catch(error => notify(error.message, 'error')));
 
     async function loadAuditLog() {
       const tbody = document.getElementById('audit-tbody');
       const response = await fetch('/api/admin/audit-log?limit=200', { cache: 'no-store' });
-      const data = await response.json();
-      if (!response.ok || !data.success) { tbody.innerHTML = `<tr><td colspan="6">${escapeHtml(data.message || 'Unable to load audit trail.')}</td></tr>`; return; }
+      const data = await readAdminJson(response, 'Unable to load the audit trail.');
       tbody.innerHTML = data.entries.length ? data.entries.map(entry => `<tr><td>${escapeHtml(new Date(entry.created_at).toLocaleString('en-IN'))}</td><td>${escapeHtml(entry.actor)}</td><td>${escapeHtml(entry.action)}</td><td>${escapeHtml(entry.entity_type)} ${escapeHtml(entry.entity_id)}</td><td><code>${escapeHtml(JSON.stringify(entry.details))}</code></td><td><small>${escapeHtml(entry.request_id)}</small></td></tr>`).join('') : '<tr><td colspan="6" class="loading-text">No audited changes yet.</td></tr>';
     }
 
@@ -547,10 +633,8 @@
     function loadOrders() {
       const tbody = document.getElementById('orders-tbody');
       fetch('/api/admin/orders')
-        .then(res => res.json())
+        .then(response => readAdminJson(response, 'Unable to load orders.'))
         .then(data => {
-          if (!data.success) throw new Error(data.message);
-          
           if (data.orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No orders recorded in database yet.</td></tr>';
             return;
@@ -577,7 +661,7 @@
                 <td>${paymentDetails}<br><b>₹${order.total_amount}</b></td>
                 <td><b>${escapeHtml(order.delivery_date || 'Date pending')}</b><br><small>${escapeHtml(order.delivery_slot)}</small><br><span style="color:var(--muted); font-size:10px;">Placed ${dateStr}</span></td>
                 <td>
-                  <select class="status-select" data-id="${order.id}" ${!(orderTransitions[order.status] || []).length ? 'disabled' : ''}>${statusOptions(order.status)}</select>
+                  <select class="status-select" data-id="${escapeHtml(order.id)}" aria-label="Status for order ${escapeHtml(order.id)}" ${!(orderTransitions[order.status] || []).length ? 'disabled' : ''}>${statusOptions(order.status)}</select>
                 </td>
               </tr>
             `;
@@ -585,24 +669,30 @@
 
           // Bind status change listeners
           document.querySelectorAll('.status-select').forEach(select => {
-            select.addEventListener('change', () => {
+            select.addEventListener('change', async () => {
               const orderId = select.dataset.id;
               const newStatus = select.value;
-              fetch(`/api/admin/orders/${orderId}/status`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-              })
-              .then(res => res.json())
-              .then(d => {
-                if (!d.success) alert(d.message);
-                else loadOrders();
-              });
+              const previousStatus = order.status;
+              select.disabled = true;
+              try {
+                const response = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ status: newStatus })
+                });
+                const data = await readAdminJson(response, 'Unable to update the order status.');
+                notify(data.message || `Order #${orderId} updated.`);
+                loadOrders();
+              } catch (error) {
+                select.value = previousStatus;
+                select.disabled = !(orderTransitions[previousStatus] || []).length;
+                notify(error.message, 'error');
+              }
             });
           });
         })
         .catch(err => {
-          tbody.innerHTML = `<tr><td colspan="6" class="loading-text" style="color:#a94442">Failed to load orders: ${err.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" class="loading-text" style="color:#a94442">Failed to load orders: ${escapeHtml(err.message)}</td></tr>`;
         });
     }
 
@@ -610,10 +700,8 @@
     function loadSubscriptions() {
       const tbody = document.getElementById('subs-tbody');
       fetch('/api/admin/subscriptions')
-        .then(res => res.json())
+        .then(response => readAdminJson(response, 'Unable to load subscriptions.'))
         .then(data => {
-          if (!data.success) throw new Error(data.message);
-          
           if (data.subscriptions.length === 0) {
             tbody.innerHTML = '<tr><td colspan="9" class="loading-text">No active subscriptions registered.</td></tr>';
             return;
@@ -652,14 +740,17 @@
           }).join('');
         })
         .catch(err => {
-          tbody.innerHTML = `<tr><td colspan="6" class="loading-text" style="color:#a94442">Failed to load subscriptions: ${err.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="9" class="loading-text" style="color:#a94442">Failed to load subscriptions: ${escapeHtml(err.message)}</td></tr>`;
         });
     }
 
     // Create Quality Batch Form Submit
-    document.getElementById('create-batch-form').addEventListener('submit', e => {
+    document.getElementById('create-batch-form').addEventListener('submit', async e => {
       e.preventDefault();
-      
+      const form = e.currentTarget;
+      const submitter = e.submitter;
+      const originalLabel = submitter?.textContent;
+      if (submitter) { submitter.disabled = true; submitter.textContent = 'SAVING…'; }
       const payload = {
         id: document.getElementById('batch-id').value.trim(),
         product_name: document.getElementById('batch-product').value,
@@ -670,48 +761,45 @@
         quality_score: parseInt(document.getElementById('batch-score').value)
       };
 
-      fetch('/api/admin/batches', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(d => {
-        alert(d.message);
-        if (d.success) {
-          document.getElementById('create-batch-form').reset();
-        }
-      })
-      .catch(err => alert('Failed to create batch: ' + err.message));
+      try {
+        const response = await fetch('/api/admin/batches', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await readAdminJson(response, 'Unable to save the batch quality record.');
+        notify(data.message || 'Batch quality record saved.');
+        form.reset();
+      } catch (error) {
+        notify(error.message, 'error');
+      } finally {
+        if (submitter) { submitter.disabled = false; submitter.textContent = originalLabel; }
+      }
     });
 
     // Mock Webhook Submit
-    document.getElementById('webhook-form').addEventListener('submit', e => {
+    document.getElementById('webhook-form').addEventListener('submit', async e => {
       e.preventDefault();
-      
+      const form = e.currentTarget;
+      const submitter = e.submitter;
+      const originalLabel = submitter?.textContent;
+      if (submitter) { submitter.disabled = true; submitter.textContent = 'PROCESSING…'; }
       const payload = {
         utr: document.getElementById('webhook-utr').value.trim(),
         status: document.getElementById('webhook-status').value
       };
 
-      fetch('/api/admin/payments/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(d => {
-        alert(d.message);
-        if (d.success) {
-          document.getElementById('webhook-form').reset();
-          loadOrders(); // Reload orders in background
-        }
-      })
-      .catch(err => alert('Webhook callback failed: ' + err.message));
+      try {
+        const response = await fetch('/api/admin/payments/simulate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await readAdminJson(response, 'Unable to process the simulated payment.');
+        notify(data.message || 'Simulated payment processed.');
+        form.reset();
+        loadOrders();
+      } catch (error) {
+        notify(error.message, 'error');
+      } finally {
+        if (submitter) { submitter.disabled = false; submitter.textContent = originalLabel; }
+      }
     });
 
     // Initial load
-    loadDashboard().catch(error => alert(error.message));
+    loadDashboard().catch(error => notify(error.message, 'error'));
     loadOrders();
     loadSubscriptions();
   </script>

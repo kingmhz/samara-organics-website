@@ -20,7 +20,7 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
   const subHeaderBtn = document.querySelector('#subscribe-header-btn');
   const subModalClose = document.querySelector('#subscribe-modal-close');
   const subForm = document.querySelector('#subscribe-modal-form');
-  subForm?.addEventListener('input', () => { activeSubscriptionIdempotencyKey = null; });
+  subForm?.addEventListener('input', () => { activeSubscriptionIdempotencyKey = null; setSubFeedback(''); });
   const subCalendarGrid = document.querySelector('#sub-calendar-grid');
   
   const subProduct = document.querySelector('#sub-product');
@@ -41,11 +41,18 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
   
   const subDirectBtn = document.querySelector('#sub-direct-btn');
   const subWhatsappBtn = document.querySelector('#sub-whatsapp-btn');
+  const subFeedback = document.querySelector('#sub-feedback');
   
   const subSuccessCloseBtn = document.querySelector('#sub-success-close-btn');
   const subSuccessView = document.querySelector('.sub-success-view');
   const subFormContainer = document.querySelector('#sub-form-container');
   const modalManager = window.SamaraModal;
+
+  const setSubFeedback = (message = '') => {
+    if (!subFeedback) return;
+    subFeedback.textContent = message;
+    subFeedback.classList.toggle('show', Boolean(message));
+  };
 
   let currentYear, currentMonth;
   let selectedDates = new Set();
@@ -54,6 +61,7 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
   const today = indiaCalendarToday();
   currentYear = today.getUTCFullYear();
   currentMonth = today.getUTCMonth();
+  let focusedDateKey = calendarDateKey(today);
 
   // Define booking bounds: Next 60 days maximum
   const bookingStart = new Date(today);
@@ -81,6 +89,7 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
 
   // Helper to open modal
   const open = () => {
+    setSubFeedback('');
     if (modalManager) modalManager.open(subModal, document.activeElement, subModalClose);
     else {
       subModal?.removeAttribute('inert');
@@ -154,52 +163,89 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
     for (let i = 0; i < startDay; i++) {
       const blank = document.createElement('span');
       blank.className = 'day-empty';
+      blank.setAttribute('aria-hidden', 'true');
       subCalendarGrid.appendChild(blank);
     }
     
     for (let day = 1; day <= totalDays; day++) {
       const cellDate = new Date(Date.UTC(year, month, day));
       
-      const cell = document.createElement('span');
+      const cell = document.createElement('button');
+      cell.type = 'button';
       cell.textContent = day;
       
       const dateString = calendarDateKey(cellDate);
       const isWeekend = cellDate.getUTCDay() === 0 || cellDate.getUTCDay() === 6;
       
-      if (isWeekend) {
-        cell.classList.add('day-weekend');
-      }
-      
       if (cellDate < bookingStart || cellDate > bookingEnd) {
         cell.className = 'day-disabled';
+        cell.disabled = true;
+        cell.tabIndex = -1;
+        cell.setAttribute('aria-label', `${cellDate.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}, unavailable`);
       } else {
         cell.className = 'day-active';
+        cell.dataset.date = dateString;
+        cell.tabIndex = dateString === focusedDateKey ? 0 : -1;
         
         if (selectedDates.has(dateString)) {
           cell.classList.add('day-selected');
         }
+        const selected = selectedDates.has(dateString);
+        cell.setAttribute('aria-pressed', String(selected));
+        cell.setAttribute('aria-label', `${cellDate.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}, ${selected ? 'selected' : 'not selected'}`);
         
         cell.addEventListener('click', () => {
           if (subSchedule && subSchedule.value !== 'custom') {
             subSchedule.value = 'custom';
           }
-          toggleDate(dateString);
+          focusedDateKey = dateString;
+          toggleDate(dateString, true);
+        });
+        cell.addEventListener('keydown', event => {
+          const offset = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowDown' ? 7 : event.key === 'ArrowUp' ? -7 : 0;
+          if (!offset) return;
+          event.preventDefault();
+          moveCalendarFocus(dateString, offset);
         });
       }
+      if (isWeekend) cell.classList.add('day-weekend');
       
       subCalendarGrid.appendChild(cell);
     }
     
+    const activeCells = [...subCalendarGrid.querySelectorAll('button.day-active')];
+    if (activeCells.length && !activeCells.some(cell => cell.tabIndex === 0)) {
+      activeCells[0].tabIndex = 0;
+      focusedDateKey = activeCells[0].dataset.date;
+    }
     updateSummary();
   }
 
-  function toggleDate(dateStr) {
+  function focusRenderedDate(dateString) {
+    const target = subCalendarGrid?.querySelector(`[data-date="${dateString}"]`);
+    if (target) target.focus({ preventScroll: true });
+    else requestAnimationFrame(() => subCalendarGrid?.querySelector(`[data-date="${dateString}"]`)?.focus({ preventScroll: true }));
+  }
+
+  function moveCalendarFocus(dateString, offset) {
+    const target = new Date(`${dateString}T00:00:00Z`);
+    target.setUTCDate(target.getUTCDate() + offset);
+    if (target < bookingStart || target > bookingEnd) return;
+    focusedDateKey = calendarDateKey(target);
+    currentYear = target.getUTCFullYear();
+    currentMonth = target.getUTCMonth();
+    renderCalendar(currentYear, currentMonth);
+    focusRenderedDate(focusedDateKey);
+  }
+
+  function toggleDate(dateStr, restoreFocus = false) {
     if (selectedDates.has(dateStr)) {
       selectedDates.delete(dateStr);
     } else {
       selectedDates.add(dateStr);
     }
     renderCalendar(currentYear, currentMonth);
+    if (restoreFocus) focusRenderedDate(dateStr);
   }
 
   prevMonthBtn?.addEventListener('click', () => {
@@ -255,10 +301,16 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
   
   subProduct?.addEventListener('change', updateSummary);
   subQty?.addEventListener('input', updateSummary);
+  subPhone?.addEventListener('input', () => {
+    subPhone.value = subPhone.value.replace(/\D/g, '').slice(0, 10);
+  });
 
   function submitSubscription(withWhatsApp) {
+    if (subForm?.hasAttribute('aria-busy')) return;
+    setSubFeedback('');
     if (selectedDates.size === 0) {
-      alert('Please select at least 1 delivery date in the calendar.');
+      setSubFeedback('Please select at least one delivery date in the calendar.');
+      subFeedback?.focus({ preventScroll: false });
       return;
     }
     
@@ -273,6 +325,7 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
     } else if (directBtn) {
       directBtn.innerHTML = `PROCESSING... <span class="spinner-icon"></span>`;
     }
+    subForm?.setAttribute('aria-busy', 'true');
     
     const name = subName.value.trim();
     const phone = subPhone.value.trim();
@@ -311,9 +364,14 @@ export function initSubscriptionBooking({ safeStore, PRODUCTS_INFO, createIdempo
         custom_dates: isoDates
       })
     })
-    .then(res => res.json())
+    .then(async res => {
+      let data;
+      try { data = await res.json(); }
+      catch { throw new Error('The subscription service returned an unreadable response. Please try again.'); }
+      if (!res.ok || !data.success) throw new Error(data.message || 'Unable to start the subscription.');
+      return data;
+    })
     .then(data => {
-      if (!data.success) throw new Error(data.message || 'Server error.');
       activeSubscriptionIdempotencyKey = null;
       
       const successTitle = document.querySelector('.sub-success-title');
@@ -347,28 +405,25 @@ Thank you for choosing Samara Organics! 🌿`;
 
         const url = `https://wa.me/918077366897?text=${encodeURIComponent(message)}`;
         
-        setTimeout(() => {
-          window.open(url, '_blank', 'noopener');
-          if (successTitle) successTitle.textContent = "Subscription Logged!";
-          if (successMsg) successMsg.innerHTML = `Please send the pre-filled WhatsApp message. Save your <a href="${managementUrl}">private management link</a> to pause, skip, update or cancel.`;
-          finalizeSub();
-        }, 950);
+        window.open(url, '_blank', 'noopener');
+        if (successTitle) successTitle.textContent = "Subscription Logged!";
+        if (successMsg) successMsg.innerHTML = `Your plan is safely recorded. <a href="${url}" target="_blank" rel="noopener" class="success-primary-link">OPEN WHATSAPP TO CONFIRM →</a><a href="${managementUrl}" class="success-secondary-link">SAVE YOUR PRIVATE MANAGEMENT LINK →</a>`;
+        finalizeSub();
       } else {
-        setTimeout(() => {
-          if (successTitle) successTitle.textContent = "Subscription Booked!";
-          if (successMsg) successMsg.innerHTML = `Subscription #${data.subscriptionId} has been logged. Save your <a href="${managementUrl}">private management link</a> to pause, skip, update or cancel.`;
-          finalizeSub();
-        }, 950);
+        if (successTitle) successTitle.textContent = "Subscription Booked!";
+        if (successMsg) successMsg.innerHTML = `Subscription #${data.subscriptionId} has been logged. <a href="${managementUrl}" class="success-primary-link">SAVE YOUR PRIVATE MANAGEMENT LINK →</a>`;
+        finalizeSub();
       }
       
       function finalizeSub() {
+        subForm?.removeAttribute('aria-busy');
         if (directBtn) {
           directBtn.disabled = false;
-          directBtn.innerHTML = `CONFIRM SUBSCRIPTION DIRECTLY <span>✓</span>`;
+          directBtn.innerHTML = `START SUBSCRIPTION <span>✓</span>`;
         }
         if (whatsappBtn) {
           whatsappBtn.disabled = false;
-          whatsappBtn.innerHTML = `SUBSCRIBE VIA WHATSAPP <span>→</span>`;
+          whatsappBtn.innerHTML = `START &amp; CONFIRM ON WHATSAPP <span>→</span>`;
         }
         
         if (subFormContainer) subFormContainer.style.display = 'none';
@@ -377,14 +432,16 @@ Thank you for choosing Samara Organics! 🌿`;
     })
     .catch(err => {
       console.error(err);
-      alert('Subscription failed: ' + err.message);
+      subForm?.removeAttribute('aria-busy');
+      setSubFeedback(`We could not start the subscription: ${err.message}`);
+      subFeedback?.focus({ preventScroll: false });
       if (directBtn) {
         directBtn.disabled = false;
-        directBtn.innerHTML = `CONFIRM SUBSCRIPTION DIRECTLY <span>✓</span>`;
+        directBtn.innerHTML = `START SUBSCRIPTION <span>✓</span>`;
       }
       if (whatsappBtn) {
         whatsappBtn.disabled = false;
-        whatsappBtn.innerHTML = `SUBSCRIBE VIA WHATSAPP <span>→</span>`;
+        whatsappBtn.innerHTML = `START &amp; CONFIRM ON WHATSAPP <span>→</span>`;
       }
     });
   }

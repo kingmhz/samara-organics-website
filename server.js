@@ -7,11 +7,12 @@ import { fileURLToPath } from 'node:url';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { readFileSync, readdirSync } from 'node:fs';
 import { constants as zlibConstants } from 'node:zlib';
-import { dbGet, dbRun, dbAll, dbTransaction, dbExclusive, databaseReady, closeDatabase } from './database.js';
+import { paymentMethodsFor, productionConfigurationErrors } from './production-config.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = dirname(fileURLToPath(import.meta.url));
+const PUBLIC_SITE_URL = 'https://samaraorganics.in';
 const inlineScriptHashes = new Set();
 for (const filename of readdirSync(ROOT).filter(name => name.endsWith('.html'))) {
   const html = readFileSync(join(ROOT, filename), 'utf8');
@@ -30,13 +31,58 @@ async function refreshProductCatalog() {
   for (const product of products) PRODUCTS_INFO[product.product_name] = { price: product.price, unit: product.unit, active: Boolean(product.active), sortOrder: product.sort_order, updatedAt: product.updated_at };
   return PRODUCTS_INFO;
 }
+const structuredProductDetails = new Map([
+  ['Organic A2 Milk', { name: 'Farm Fresh Milk', image: 'assets/samara-heritage-milk.jpg', anchor: 'milk' }],
+  ['Bilona Desi Ghee', { name: 'Bilona Desi Ghee', image: 'assets/samara-heritage-ghee.jpg', anchor: 'ghee' }],
+  ['Traditional Dahi', { name: 'Traditional Dahi', image: 'assets/samara-heritage-dahi.jpg', anchor: 'dahi' }]
+]);
+function siteStructuredData(inventoryRows = []) {
+  const inventory = new Map(inventoryRows.map(row => [row.product_name, Number(row.available_qty) || 0]));
+  const products = [...structuredProductDetails].map(([catalogueName, details]) => {
+    const product = PRODUCTS_INFO[catalogueName] || {};
+    const available = Boolean(product.active) && (inventory.get(catalogueName) || 0) > 0;
+    const productUrl = `${PUBLIC_SITE_URL}/products.html#${details.anchor}`;
+    return {
+      '@type': 'Product', '@id': `${PUBLIC_SITE_URL}/products.html#product-${details.anchor}`, name: details.name,
+      brand: { '@type': 'Brand', name: 'Samara Organics' }, category: 'Dairy',
+      image: `${PUBLIC_SITE_URL}/${details.image}`,
+      offers: {
+        '@type': 'Offer', url: productUrl, price: Number(product.price) || 0,
+        priceCurrency: 'INR', availability: `https://schema.org/${available ? 'InStock' : 'OutOfStock'}`,
+        itemCondition: 'https://schema.org/NewCondition', seller: { '@id': `${PUBLIC_SITE_URL}/#business` }
+      }
+    };
+  });
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'LocalBusiness', '@id': `${PUBLIC_SITE_URL}/#business`, name: 'Samara Organics', url: `${PUBLIC_SITE_URL}/`,
+        image: `${PUBLIC_SITE_URL}/assets/samara-heritage-hero.jpg`, logo: `${PUBLIC_SITE_URL}/assets/samara-heritage-logo.jpg`,
+        description: 'Farm-fresh, locally handled dairy with transparent batch records serving Aligarh, Bulandshahr and nearby communities.',
+        telephone: '+91-8077366897', email: 'samaraorganics.india@gmail.com',
+        address: { '@type': 'PostalAddress', streetAddress: 'Kothi Lalarukh, Above Union Bank of India, Civil Lines, Medical Road', addressLocality: 'Aligarh', addressRegion: 'Uttar Pradesh', addressCountry: 'IN' },
+        areaServed: ['Aligarh', 'Bulandshahr', 'Khurja'], sameAs: ['https://instagram.com/samaraorganics.india']
+      },
+      ...products,
+      {
+        '@type': 'FAQPage', mainEntity: [
+          { '@type': 'Question', name: 'Where will you deliver first?', acceptedAnswer: { '@type': 'Answer', text: 'Initial routes are planned around Aligarh, Bulandshahr, Khurja and nearby communities.' } },
+          { '@type': 'Question', name: 'How will Samara prove quality?', acceptedAnswer: { '@type': 'Answer', text: 'Samara is designing batch-level quality information covering source, collection timing, core checks and handling.' } },
+          { '@type': 'Question', name: 'Which products are launching?', acceptedAnswer: { '@type': 'Answer', text: 'Farm fresh milk, naturally set dahi and bilona desi ghee are planned first.' } },
+          { '@type': 'Question', name: 'Can I reserve a subscription now?', acceptedAnswer: { '@type': 'Answer', text: 'Customers can join the first-delivery list and will be contacted when their route opens.' } }
+        ]
+      }
+    ]
+  };
+}
 const DELIVERY_SLOTS = new Set(['Morning (6:00 AM - 9:00 AM)', 'Evening (6:00 PM - 9:00 PM)']);
 // Checkout creates one delivery only. Recurring commitments belong exclusively
 // to /api/subscriptions so the first occurrence cannot be duplicated in both tables.
 const DELIVERY_SCHEDULES = new Set(['one-time']);
 const SUBSCRIPTION_SCHEDULES = new Set(['daily', 'alternate', 'weekend', 'custom']);
 const PAYMENT_PROVIDER_ENABLED = process.env.PAYMENT_PROVIDER_ENABLED === '1';
-const PAYMENT_METHODS = new Set(['COD', ...(!IS_PRODUCTION || PAYMENT_PROVIDER_ENABLED ? ['UPI'] : [])]);
+const PAYMENT_METHODS = new Set(paymentMethodsFor(process.env));
 const ORDER_STATUSES = new Set(['Pending', 'Awaiting Payment Verification', 'Confirmed', 'Out for Delivery', 'Delivered', 'Cancelled', 'Payment Failed']);
 const ORDER_TRANSITIONS = new Map([
   ['Pending', new Set(['Confirmed', 'Cancelled'])],
@@ -60,18 +106,16 @@ const localOrigins = IS_PRODUCTION ? [] : [`http://127.0.0.1:${PORT}`, `http://l
 const allowedOrigins = new Set([...configuredOrigins, ...localOrigins]);
 
 if (IS_PRODUCTION) {
-  const configurationErrors = [];
-  if (!ADMIN_USERNAME || ADMIN_USERNAME.length < 4 || /replace-with/i.test(ADMIN_USERNAME)) configurationErrors.push('ADMIN_USERNAME must be configured.');
-  if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 24 || /replace-with/i.test(ADMIN_PASSWORD)) configurationErrors.push('ADMIN_PASSWORD must contain at least 24 non-placeholder characters.');
-  if (!IDEMPOTENCY_ENCRYPTION_SECRET || IDEMPOTENCY_ENCRYPTION_SECRET.length < 32 || /replace-with/i.test(IDEMPOTENCY_ENCRYPTION_SECRET)) configurationErrors.push('IDEMPOTENCY_ENCRYPTION_KEY must contain at least 32 non-placeholder characters.');
-  if (PAYMENT_PROVIDER_ENABLED && (!WEBHOOK_SECRET || WEBHOOK_SECRET.length < 32 || /replace-with/i.test(WEBHOOK_SECRET))) configurationErrors.push('PAYMENT_WEBHOOK_SECRET must contain at least 32 non-placeholder characters when online payments are enabled.');
-  if (!configuredOrigins.length || configuredOrigins.some(origin => !/^https:\/\/[^/]+$/i.test(origin))) configurationErrors.push('ALLOWED_ORIGINS must contain exact HTTPS origins.');
-  if (ERROR_MONITORING_WEBHOOK_URL && !/^https:\/\//i.test(ERROR_MONITORING_WEBHOOK_URL)) configurationErrors.push('ERROR_MONITORING_WEBHOOK_URL must use HTTPS.');
+  const configurationErrors = productionConfigurationErrors(process.env);
   if (configurationErrors.length) {
     console.error(`Production configuration is invalid:\n- ${configurationErrors.join('\n- ')}`);
     process.exit(1);
   }
 }
+
+// Validate production secrets before opening persistent storage. This keeps a
+// misconfigured deployment fail-closed even when its database is unavailable.
+const { dbGet, dbRun, dbAll, dbTransaction, dbExclusive, databaseReady, closeDatabase } = await import('./database.js');
 
 const requestContext = new AsyncLocalStorage();
 const redactRequestPath = path => String(path || '')
@@ -392,10 +436,11 @@ app.get('/api/serviceability/:pincode', async (request, response) => {
 
 app.get('/api/batches/:id', async (request, response) => {
   try {
+    response.setHeader('Cache-Control', 'no-store');
     const batchId = clean(request.params.id).toUpperCase();
     if (!/^[A-Z0-9-]{5,32}$/.test(batchId)) return publicError(response, 'Invalid batch code format.');
     const batch = await dbGet('SELECT id, product_name, date, fat, snf, antibiotics, quality_score FROM batches WHERE id = ?', [batchId]);
-    if (!batch) return response.status(404).json({ success: false, message: 'Quality batch certificate not found.' });
+    if (!batch) return response.status(404).json({ success: false, message: 'Batch quality record not found.' });
     response.json({ success: true, batch });
   } catch (error) {
     reportError('batch-quality', error);
@@ -485,7 +530,7 @@ app.post('/api/orders', purchaseLimiter, async (request, response) => {
 app.get('/api/orders/track/:token', customerPortalLimiter, async (request, response) => {
   try {
     const token = clean(request.params.token).toLowerCase();
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(token)) return publicError(response, 'Invalid tracking reference.');
+    if (!validPrivateToken(token)) return publicError(response, 'Invalid tracking reference.');
     const [digest, legacy] = privateTokenCandidates(token);
     const order = await dbGet('SELECT id, items, payment_method, status, delivery_slot, delivery_date, total_amount, created_at, tracking_token AS stored_token FROM orders WHERE tracking_token IN (?, ?)', [digest, legacy]);
     if (!order) return response.status(404).json({ success: false, message: 'Order not found.' });
@@ -586,7 +631,7 @@ app.post('/api/subscriptions', purchaseLimiter, async (request, response) => {
 
 app.get('/api/subscriptions/manage/:token', customerPortalLimiter, async (request, response) => {
   try {
-    const token = clean(request.params.token);
+    const token = clean(request.params.token).toLowerCase();
     if (!validPrivateToken(token)) return publicError(response, 'Invalid subscription link.');
     const [digest, legacy] = privateTokenCandidates(token);
     const subscription = await dbGet(`SELECT id, product_name, qty, schedule, delivery_slot, start_date, end_date, custom_dates, skipped_dates, status, management_token AS stored_token, customer_name AS name, customer_phone AS phone, delivery_pincode AS pincode, delivery_address AS address FROM subscriptions WHERE management_token IN (?, ?)`, [digest, legacy]);
@@ -603,7 +648,7 @@ app.get('/api/subscriptions/manage/:token', customerPortalLimiter, async (reques
 
 app.patch('/api/subscriptions/manage/:token', customerPortalLimiter, async (request, response) => {
   try {
-    const token = clean(request.params.token);
+    const token = clean(request.params.token).toLowerCase();
     const action = clean(request.body.action);
     if (!validPrivateToken(token)) return publicError(response, 'Invalid subscription link.');
     const [digest, legacy] = privateTokenCandidates(token);
@@ -1012,12 +1057,36 @@ app.get('/admin.html', adminLimiter, adminAuth, (_request, response) => {
   response.sendFile(join(ROOT, 'admin.html'));
 });
 
+app.use('/api', (_request, response) => {
+  response.setHeader('Cache-Control', 'no-store');
+  response.status(404).json({ success: false, message: 'API endpoint not found.' });
+});
+
 app.use((request, response, next) => {
   const blockedDirectories = /(^|\/)(?:node_modules|\.git|\.agents|scripts|tests|backups|data)(?:\/|$)/i;
   const blockedFiles = /(^|\/)(?:server\.js|database\.js|preview-server\.mjs|script\.js|page\.js|tracking\.js|commerce\.js|farm-tour\.js|subscription-booking\.js|support\.js|manage-subscription\.js|styles\.css|samara\.db(?:-(?:shm|wal))?|package(?:-lock)?\.json|dockerfile|compose\.ya?ml|readme\.md|\.env(?:\..*)?)$/i;
   const blocked = blockedDirectories.test(request.path) || blockedFiles.test(request.path);
   if (blocked) return response.status(404).send('Not found');
   next();
+});
+
+app.get(['/', '/index.html'], async (_request, response, next) => {
+  try {
+    await databaseReady;
+    const inventory = await dbAll('SELECT product_name, available_qty FROM inventory');
+    const structuredJson = JSON.stringify(siteStructuredData(inventory)).replaceAll('<', '\\u003c');
+    const template = readFileSync(join(ROOT, 'index.html'), 'utf8');
+    const html = template.replace(/(<script\b[^>]*id="site-structured-data"[^>]*>)[\s\S]*?(<\/script>)/i, `$1${structuredJson}$2`);
+    if (html === template) throw new Error('Structured-data marker is missing from index.html.');
+    const structuredHash = `'sha256-${createHash('sha256').update(structuredJson).digest('base64')}'`;
+    const currentPolicy = String(response.getHeader('Content-Security-Policy') || '');
+    response.setHeader('Content-Security-Policy', currentPolicy.replace("script-src 'self'", `script-src 'self' ${structuredHash}`));
+    response.setHeader('Cache-Control', 'no-cache');
+    response.type('html').send(html);
+  } catch (error) {
+    reportError('render-homepage-metadata', error);
+    next();
+  }
 });
 
 app.use(express.static(ROOT, {
@@ -1052,11 +1121,18 @@ const server = app.listen(PORT, HOST, () => {
   if (!ADMIN_USERNAME || !ADMIN_PASSWORD) console.warn('Admin access is disabled. Set ADMIN_USERNAME and ADMIN_PASSWORD.');
   if (PAYMENT_PROVIDER_ENABLED && !WEBHOOK_SECRET) console.warn('Payment webhook is disabled. Set PAYMENT_WEBHOOK_SECRET.');
 });
-
 let shuttingDown = false;
+// Keep a strong reference to the listener and detect silent listener loss.
+// This is especially important for detached Windows launchers used locally.
+const listenerWatchdog = setInterval(() => {
+  if (server.listening || shuttingDown) return;
+  reportError('listener-watchdog', new Error('HTTP listener stopped unexpectedly.'));
+  shutdown('listener-watchdog', 1);
+}, 30000);
 async function shutdown(signal, exitCode = 0) {
   if (shuttingDown) return;
   shuttingDown = true;
+  clearInterval(listenerWatchdog);
   console.log(`${signal} received; closing the HTTP server and database.`);
   const forceExit = setTimeout(() => {
     console.error('Graceful shutdown timed out.');
